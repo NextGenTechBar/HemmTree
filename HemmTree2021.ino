@@ -62,6 +62,8 @@ int FirmwareVersionCheck();
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("BEGIN MAC: ");
+  Serial.println(deviceMacAddress);
 
   //neopixel setup
     // This is for Trinket 5V 16MHz, you can remove these three lines if you are not using a Trinket
@@ -220,10 +222,14 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
+    Serial.print("mac address1: ");
+    Serial.println(deviceMacAddress);
     if (client.connect(deviceMacAddress)) { //make client ID the mac address to ensure it's unique
       Serial.println("connected");
+      Serial.print("mac address: ");
+      Serial.println(deviceMacAddress);
       // Subscribe
-      client.subscribe("python/testing");
+      client.subscribe("GUHemmTree");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
