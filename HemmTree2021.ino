@@ -21,11 +21,14 @@
 //Adafruit_NeoPixel strip = Adafruit_NeoPixel(150, PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(); //length, etc is read from eeprom and set in setup()
 
+int stripLength=0;
 
 // Replace the next variables with your SSID/Password combination
 const char* ssid = "Gonzaga Guest"; //CenturyLink3314
 const char* password = ""; //buet2kpjnnbtw9
-const char * deviceMacAddress = WiFi.macAddress().c_str();
+String deviceMacAddress;
+
+int dynamMode=0; //MQTT message can set this variable. loop() checks it each animation step to know what mode to be in
 
 // Add your MQTT Broker IP address, example:
 //const char* mqtt_server = "192.168.1.144";
@@ -46,6 +49,24 @@ int value = 0;
 #define BME_MOSI 23
 #define BME_CS 5*/
 
+//GLOBAL VARAIBLES FOR DYNAMIC MODES
+bool setupMode=false;
+int prevMode=0;
+int mode1firstPixelHue=0;
+long mode3firstPixelHue=0;
+int mode3a=0;
+
+int mode2ctr=0;
+int mode2r=0;
+int mode2g=0;
+int mode2b=0;
+
+int mode3r=0;
+int mode3g=0;
+int mode3b=0;
+int mode3directionChangeR=0;
+int mode3directionChangeG=0;
+int mode3directionChangeB=0;
 
 // LED Pin
 const int ledPin = 4;
@@ -62,6 +83,9 @@ int FirmwareVersionCheck();
 
 void setup() {
   Serial.begin(115200);
+  randomSeed(analogRead(35));
+
+  deviceMacAddress = WiFi.macAddress();
   Serial.println("BEGIN MAC: ");
   Serial.println(deviceMacAddress);
 
@@ -74,7 +98,6 @@ void setup() {
 
 
   //Read data from eeprom to set number of pixels
-  int stripLength=0;
   int address = 0;
   int readId;
   EEPROM.begin(12); //EEPROM size
@@ -88,7 +111,7 @@ void setup() {
   //Serial.print("VALUE STORED IN EEPROM = ");
   //Serial.println(readParam);
   if(isnan(readParam)){
-    stripLength=150; //default length
+    stripLength=300; //default length
     Serial.print("No value for strip length stored in EEPROM. Using default value of ");
     Serial.println(stripLength);
   }else{
@@ -100,7 +123,7 @@ void setup() {
   Serial.println("Run EEPROM value update file on GITHUB to change strip length on this ESP");
 
   EEPROM.end();
-  Adafruit_NeoPixel strip = Adafruit_NeoPixel(150, PIN, NEO_GRB + NEO_KHZ800);
+  //strip = Adafruit_NeoPixel(150, PIN, NEO_GRB + NEO_KHZ800);
   strip.updateType(NEO_GRB + NEO_KHZ800);
   strip.setPin(PIN);
   strip.updateLength(stripLength);
@@ -110,7 +133,29 @@ void setup() {
   strip.setBrightness(255);
   strip.show(); // Initialize all pixels to 'off'
   //----
-  
+
+
+/*
+  for(int i=0;i<stripLength;i++){
+    strip.setPixelColor(i, strip.Color(255,0,0));
+    strip.show();
+  }
+  for(int i=0;i<stripLength;i++){
+    strip.setPixelColor(i, strip.Color(0,255,0));
+    strip.show();
+  }
+  for(int i=0;i<stripLength;i++){
+    strip.setPixelColor(i, strip.Color(0,0,255));
+    strip.show();
+  }
+*/
+  //temp for testing
+  for(int i=0;i<stripLength;i++){
+    strip.setPixelColor(i, strip.Color(255,255,255));
+    delay(5);
+    strip.show();
+  }
+
   // default settings
   // (you can also pass in a Wire library object like &Wire2)
   //status = bme.begin();
@@ -161,8 +206,8 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.println();
 
   //initialize blank array to store colors in (eventually pushed to strip)
-  int stringUpdate[strip.numPixels()][3];
-  for(int i=0;i<strip.numPixels();i++){
+  int stringUpdate[stripLength][3];
+  for(int i=0;i<stripLength;i++){
     for(int k=0;k<3;k++){
       stringUpdate[i][k]=0;
     }
@@ -178,14 +223,49 @@ void callback(char* topic, byte* message, unsigned int length) {
     }
   }
 
+  if(messageTemp.substring(0,5)=="PULSE"){ //send for example, PULSE9 to pulse strip 9 times. Intended use case is to pulse the hour
+    int numPulses=messageTemp.substring(5).toInt();
+    
+    for(uint16_t i=0; i<stripLength; i++) {
+      uint8_t LEDr =(strip.getPixelColor(i) >> 16);
+      uint8_t LEDg =(strip.getPixelColor(i) >> 8);
+      uint8_t LEDb =(strip.getPixelColor(i)) ;
+      stringUpdate[i][0]=LEDr;
+      stringUpdate[i][1]=LEDg;
+      stringUpdate[i][2]=LEDb;
+    }
+
+    for(int chime=0;chime<numPulses;chime++){
+
+      for(int fadeOut=255;fadeOut>0;fadeOut--){
+        if(fadeOut%5==0){
+          for(int i=0;i<stripLength;i++){
+            strip.setPixelColor(i, strip.Color(stringUpdate[i][0]*fadeOut/255.0,stringUpdate[i][1]*fadeOut/255.0,stringUpdate[i][2]*fadeOut/255.0));
+          }
+          strip.show();
+        }
+      }
+
+      for(int fadeOn=0;fadeOn<255;fadeOn++){
+        if(fadeOn%5==0){
+          strip.setBrightness(fadeOn);
+          for(int i=0;i<stripLength;i++){
+            strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
+          }
+          strip.show();
+        }
+      }
+      delay(500);
+    }
+  }
+
   int repetitions=0;
-  if(messageTemp.substring(0,5)=="COLOR"){ //if it's a raw color
+  if(messageTemp.substring(0,5)=="COLOR"){ //repeats the received sequence for the whole string
     int msgLen=9;
-    for(int i=0;i<strip.numPixels();i++){
+    for(int i=0;i<stripLength;i++){
       stringUpdate[i][0]=messageTemp.substring(5+i*msgLen,8+i*msgLen).toInt(); //red
       stringUpdate[i][1]=messageTemp.substring(8+i*msgLen,11+i*msgLen).toInt(); //green
       stringUpdate[i][2]=messageTemp.substring(11+i*msgLen,14+i*msgLen).toInt(); //blue
-      
       if(messageTemp[14+i*msgLen]==NULL){
         repetitions=i+1;
         break;
@@ -193,27 +273,64 @@ void callback(char* topic, byte* message, unsigned int length) {
     }
 
     //now fill the rest of the empty string with a repetition of the beginning
-    for(int i=repetitions;i<strip.numPixels();i++){
+    for(int i=repetitions;i<stripLength;i++){
       stringUpdate[i][0]=stringUpdate[i%repetitions][0];
       stringUpdate[i][1]=stringUpdate[i%repetitions][1];
       stringUpdate[i][2]=stringUpdate[i%repetitions][2];
     }
 
-    for(int i=0; i<strip.numPixels(); i++) {
+    for(int i=0; i<stripLength; i++) {
       strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
+      delay(5);
+      strip.show();
     }
-    strip.show();
-
-
-  for(int i=0;i<strip.numPixels();i++){
+/*
+  for(int i=0;i<stripLength;i++){
     for(int k=0;k<3;k++){
       Serial.print(stringUpdate[i][k]);
       Serial.print(" ");
     }
     Serial.println();
-  }
+  }*/
   }
 
+  int numColors=0;
+  if(messageTemp.substring(0,5)=="FRACS"){ //divides the string in to equal quantities for each color
+    int msgLen=9;
+    for(int i=0;i<stripLength;i++){ //find out how many colors have been sent
+      if(messageTemp[14+i*msgLen]==NULL){
+        numColors=i+1;
+        break;
+      }
+    }
+
+    
+    for(int k=0;k<numColors;k++){ //each block of colors
+      for(int i=k*stripLength/numColors;i<(k+1)*stripLength/numColors;i++){
+        int red=messageTemp.substring(5+k*msgLen,8+k*msgLen).toInt(); //red
+        int green=messageTemp.substring(8+k*msgLen,11+k*msgLen).toInt(); //green
+        int blue=messageTemp.substring(11+k*msgLen,14+k*msgLen).toInt(); //blue
+        strip.setPixelColor(i,strip.Color(red,green,blue));
+
+        delay(5);
+        strip.show();
+      }
+    }
+  }
+
+  if(messageTemp.substring(0,5)=="DYNAM"){ //modes that involve motion
+    if(messageTemp.substring(5)=="rainbow"){
+      dynamMode=1;
+    }else if(messageTemp.substring(5)=="colorwipe"){
+      dynamMode=2;
+    }else if(messageTemp.substring(5)=="chase"){
+      dynamMode=3;    
+    }else if(messageTemp.substring(5)=="fade"){
+      dynamMode=4;
+    }
+  }else if (messageTemp.substring(0,5)!="PULSE"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
+    dynamMode=0; 
+  }
   
 }
 
@@ -224,9 +341,9 @@ void reconnect() {
     // Attempt to connect
     Serial.print("mac address1: ");
     Serial.println(deviceMacAddress);
-    if (client.connect(deviceMacAddress)) { //make client ID the mac address to ensure it's unique
+    if (client.connect(deviceMacAddress.c_str())) { //make client ID the mac address to ensure it's unique
       Serial.println("connected");
-      Serial.print("mac address: ");
+      Serial.print("mac address2: ");
       Serial.println(deviceMacAddress);
       // Subscribe
       client.subscribe("GUHemmTree");
@@ -243,18 +360,142 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
-  client.loop();
+  client.loop(); //checks for new MQTT msg
 
-
-    delay(2000);
-    Serial.println("animating1...");
-    client.loop();
-    delay(2000);
-    Serial.println("animating2...");
+  if(dynamMode!=0){
+    setupMode=false;
+    if(prevMode!=dynamMode){
+      setupMode=true;
+      prevMode=dynamMode;
+    }
+  }else{
+    prevMode=0;
+  }
+  
+  if(dynamMode==1){
+    rainbow();
+  }else if(dynamMode==2){
+    colorWipe();
+  }else if(dynamMode==3){
+    chase();
+  }else if(dynamMode==4){
+    fade();
+  }
   
 
 }
 
+//DYNAMIC ANIMATION FUNCTIONS
+void rainbow(){
+  
+  if(setupMode){ //first loop of this function, set it up
+    mode1firstPixelHue=0;
+  }
+  
+  for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
+    int pixelHue = mode1firstPixelHue + (i * 65536L / strip.numPixels());
+    strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+  }
+  strip.show(); // Update strip with new contents
+  delay(11);  // Pause for a moment
+  
+  mode1firstPixelHue+=256; //emulating for loop
+  if(mode1firstPixelHue>=5*65536){ //emulating for loop
+    mode1firstPixelHue=0;
+  }
+
+}
+
+void colorWipe(){
+  if(setupMode){
+    mode2r = random(0,255);
+    mode2g = random(0,255);
+    mode2b = random(0,255);
+    mode2ctr=0;
+  }
+
+  strip.setPixelColor(mode2ctr, strip.Color(mode2r,mode2g,mode2b));
+  strip.show();
+  mode2ctr++;
+  if(mode2ctr>=stripLength){ //reset and make new colors
+    mode2ctr=0;
+    if(random(0,4)==0){ //25% of the time
+      mode2r = random(30,220);
+    }else{
+      if(random(0,2)==0){
+        mode2r = random(0,30);  
+      }else{
+        mode2r = random(220,255);
+      }
+    }
+    if(random(0,4)==0){ //25% of the time
+      mode2g = random(30,220);
+    }else{
+      if(random(0,2)==0){
+        mode2g = random(0,30);  
+      }else{
+        mode2g = random(220,255);
+      }
+    }
+    if(random(0,4)==0){ //25% of the time
+      mode2b = random(30,220);
+    }else{
+      if(random(0,2)==0){
+        mode2b = random(0,30);  
+      }else{
+        mode2b = random(220,255);
+      }
+    }
+  }
+}
+
+void chase(){
+  if(setupMode){
+    mode3firstPixelHue = 0;
+    mode3a = 0;
+  }
+  int wait=60;
+
+  for(int b=0; b<3; b++) { //  'b' counts from 0 to 2...
+    strip.clear();         //   Set all pixels in RAM to 0 (off)
+    // 'c' counts up from 'b' to end of strip in increments of 3...
+    for(int c=b; c<strip.numPixels(); c += 3) {
+      // hue of pixel 'c' is offset by an amount to make one full
+      // revolution of the color wheel (range 65536) along the length
+      // of the strip (strip.numPixels() steps):
+      int      hue   = mode3firstPixelHue + c * 65536L / strip.numPixels();
+      uint32_t color = strip.gamma32(strip.ColorHSV(hue)); // hue -> RGB
+      strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
+    }
+    strip.show();                // Update strip with new contents
+    delay(wait);                 // Pause for a moment
+    mode3firstPixelHue += 65536 / 90; // One cycle of color wheel over 90 frames
+  }
+  mode3a++;
+  if(mode3a>29){
+    mode3a=0;
+  }
+  
+}
+
+void fade(){
+  if(setupMode){
+    mode3r = random(0,255);
+    mode3g = random(0,255);
+    mode3b = random(0,255);
+  }
+
+  mode3directionChangeR; //change this 20% of the time to 0 or 1 and multiply by changeRed
+  
+  int changeRed=random(0,5);
+  int changeGreen=random(0,5);
+  int changeBlue=random(0,5);
+  for(int i=0;i<stripLength;i++){
+    
+  }
+  strip.show();
+  
+}
 
 
 //GITHUB FIRMWARE UPDATE
