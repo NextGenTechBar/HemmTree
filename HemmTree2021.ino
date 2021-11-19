@@ -111,7 +111,7 @@ void setup() {
   //Serial.print("VALUE STORED IN EEPROM = ");
   //Serial.println(readParam);
   if(isnan(readParam)){
-    stripLength=300; //default length
+    stripLength=120; //default length
     Serial.print("No value for strip length stored in EEPROM. Using default value of ");
     Serial.println(stripLength);
   }else{
@@ -566,6 +566,13 @@ int FirmwareVersionCheck(void) {
     {
       Serial.println(payload);
       Serial.println("New firmware detected");
+      strip.clear();
+      for(int i=0;i<stripLength;i++){
+        if(i%5==0){
+          strip.setPixelColor(i, strip.Color(50,50,50));
+        }
+      }
+      strip.show();
       return 1;
     }
   } 
