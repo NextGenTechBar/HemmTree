@@ -68,12 +68,14 @@ int mode3directionChangeR=0;
 int mode3directionChangeG=0;
 int mode3directionChangeB=0;
 
+bool RGB; //in setup() check if D15 is grounded, if so, use GRB formatting, otherwise, use RGB
+
 // LED Pin
 const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.01"
+  "0.11"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -82,6 +84,9 @@ void firmwareUpdate();
 int FirmwareVersionCheck();
 
 void setup() {
+  pinMode(15,INPUT_PULLUP);
+  RGB=digitalRead(15);
+  
   Serial.begin(115200);
   randomSeed(analogRead(35));
 
@@ -101,6 +106,20 @@ void setup() {
   int address = 0;
   int readId;
   EEPROM.begin(12); //EEPROM size
+
+  /*
+  //UNCOMMENT TO WRITE NEW STRING LENGTH TO EEPROM
+  int boardId = 18;
+  EEPROM.write(address, boardId);//EEPROM.put(address, boardId);
+  address += sizeof(boardId); //update address value
+
+  float param = 120; // CHANGE THIS VALUE TO WHAT YOU WANT THE STRING LENGTH TO BEEEEEEEEEEEEEEEEEEEEEEEE
+  EEPROM.writeFloat(address, param);//EEPROM.put(address, param);
+  EEPROM.commit();
+  address = 0;
+  //END TEMP ADDED 
+  */
+  
   readId = EEPROM.read(address); //EEPROM.get(address,readId);
   //Serial.print("Read Id = ");
   //Serial.println(readId);
@@ -149,7 +168,7 @@ void setup() {
     strip.show();
   }
 */
-  //temp for testing
+  //all white on boot
   for(int i=0;i<stripLength;i++){
     strip.setPixelColor(i, strip.Color(255,255,255));
     delay(5);
@@ -236,13 +255,20 @@ void callback(char* topic, byte* message, unsigned int length) {
     }
 
     for(int chime=0;chime<numPulses;chime++){
-
+    int speedFactorCourse=0; //higher is slower-->more delay (in millis)
+    int speedFactorFine=0;   //in micros
+      if(stripLength==18){ //slow down for shorter strips so longer ones can keep up
+        speedFactorCourse=3;
+        speedFactorFine=739;  //735 is SLIGHTLY too fast , 742 is too slow
+      }
       for(int fadeOut=255;fadeOut>0;fadeOut--){
         if(fadeOut%5==0){
           for(int i=0;i<stripLength;i++){
             strip.setPixelColor(i, strip.Color(stringUpdate[i][0]*fadeOut/255.0,stringUpdate[i][1]*fadeOut/255.0,stringUpdate[i][2]*fadeOut/255.0));
           }
           strip.show();
+          delay(speedFactorCourse);
+          delayMicroseconds(speedFactorFine);
         }
       }
 
@@ -253,6 +279,8 @@ void callback(char* topic, byte* message, unsigned int length) {
             strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
           }
           strip.show();
+          delay(speedFactorCourse);
+          delayMicroseconds(speedFactorFine);
         }
       }
       delay(500);
