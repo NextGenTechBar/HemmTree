@@ -64,9 +64,9 @@ int mode2b=0;
 int mode3r=0;
 int mode3g=0;
 int mode3b=0;
-int mode3directionChangeR=0;
-int mode3directionChangeG=0;
-int mode3directionChangeB=0;
+int mode3directionR=1; //1 is up, -1 is down
+int mode3directionG=1;
+int mode3directionB=1;
 
 bool RGB; //in setup() check if D15 is grounded, if so, use GRB formatting, otherwise, use RGB
 
@@ -75,7 +75,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.11"
+  "0.112"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -444,8 +444,15 @@ void colorWipe(){
 
   strip.setPixelColor(mode2ctr, strip.Color(mode2r,mode2g,mode2b));
   strip.show();
+  if(stripLength==18){
+    delay(100);  
+  }else{
+    delay(30);
+  }
+  
   mode2ctr++;
   if(mode2ctr>=stripLength){ //reset and make new colors
+    delay(500);
     mode2ctr=0;
     if(random(0,4)==0){ //25% of the time
       mode2r = random(30,220);
@@ -513,16 +520,33 @@ void fade(){
     mode3b = random(0,255);
   }
 
-  mode3directionChangeR; //change this 20% of the time to 0 or 1 and multiply by changeRed
+  if(random(0,20)==0){ //20% of the time, change the direction
+    mode3directionR*=-1;
+  }
+  if(random(0,20)==0){
+    mode3directionG*=-1;
+  }
+  if(random(0,20)==0){
+    mode3directionG*=-1;
+  }
   
   int changeRed=random(0,5);
   int changeGreen=random(0,5);
   int changeBlue=random(0,5);
+
+  mode3r = mode3r+changeRed*mode3directionR;
+  mode3g = mode3g+changeGreen*mode3directionG;
+  mode3b = mode3b+changeBlue*mode3directionB;
+  
+  mode3r = constrain(mode3r,0,255); //keep within range if it goes outside
+  mode3g = constrain(mode3g,0,255);
+  mode3b = constrain(mode3b,0,255);
+  
   for(int i=0;i<stripLength;i++){
-    
+    strip.setPixelColor(i,mode3r,mode3g,mode3b);
   }
   strip.show();
-  
+  delay(20);
 }
 
 
