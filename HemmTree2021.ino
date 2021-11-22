@@ -75,13 +75,14 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.112"
+  "0.114"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
 
 void firmwareUpdate();
 int FirmwareVersionCheck();
+void stripUpdate();
 
 void setup() {
   pinMode(15,INPUT_PULLUP);
@@ -192,6 +193,14 @@ void setup() {
   pinMode(ledPin, OUTPUT);
 }
 
+void stripUpdate(int pixel,int r,int g,int b){
+  if(RGB){
+    strip.setPixelColor(pixel, strip.Color(r,g,b));
+  }else{
+    strip.setPixelColor(pixel, strip.Color(g,r,b));
+  }
+}
+
 void setup_wifi() {
   delay(10);
   // We start by connecting to a WiFi network
@@ -264,7 +273,7 @@ void callback(char* topic, byte* message, unsigned int length) {
       for(int fadeOut=255;fadeOut>0;fadeOut--){
         if(fadeOut%5==0){
           for(int i=0;i<stripLength;i++){
-            strip.setPixelColor(i, strip.Color(stringUpdate[i][0]*fadeOut/255.0,stringUpdate[i][1]*fadeOut/255.0,stringUpdate[i][2]*fadeOut/255.0));
+            stripUpdate(i, stringUpdate[i][0]*fadeOut/255.0,stringUpdate[i][1]*fadeOut/255.0,stringUpdate[i][2]*fadeOut/255.0);
           }
           strip.show();
           delay(speedFactorCourse);
@@ -276,7 +285,7 @@ void callback(char* topic, byte* message, unsigned int length) {
         if(fadeOn%5==0){
           strip.setBrightness(fadeOn);
           for(int i=0;i<stripLength;i++){
-            strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
+            stripUpdate(i, stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]);
           }
           strip.show();
           delay(speedFactorCourse);
@@ -308,7 +317,8 @@ void callback(char* topic, byte* message, unsigned int length) {
     }
 
     for(int i=0; i<stripLength; i++) {
-      strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
+      //strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
+      stripUpdate(i,stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]);
       delay(5);
       strip.show();
     }
@@ -338,7 +348,7 @@ void callback(char* topic, byte* message, unsigned int length) {
         int red=messageTemp.substring(5+k*msgLen,8+k*msgLen).toInt(); //red
         int green=messageTemp.substring(8+k*msgLen,11+k*msgLen).toInt(); //green
         int blue=messageTemp.substring(11+k*msgLen,14+k*msgLen).toInt(); //blue
-        strip.setPixelColor(i,strip.Color(red,green,blue));
+        stripUpdate(i,red,green,blue);
 
         delay(5);
         strip.show();
@@ -442,7 +452,7 @@ void colorWipe(){
     mode2ctr=0;
   }
 
-  strip.setPixelColor(mode2ctr, strip.Color(mode2r,mode2g,mode2b));
+  stripUpdate(mode2ctr,mode2r,mode2g,mode2b);
   strip.show();
   if(stripLength==18){
     delay(100);  
@@ -543,7 +553,7 @@ void fade(){
   mode3b = constrain(mode3b,0,255);
   
   for(int i=0;i<stripLength;i++){
-    strip.setPixelColor(i,mode3r,mode3g,mode3b);
+    stripUpdate(i,mode3r,mode3g,mode3b);
   }
   strip.show();
   delay(20);
