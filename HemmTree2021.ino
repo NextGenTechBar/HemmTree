@@ -75,7 +75,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.118"
+  "0.119"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -537,8 +537,62 @@ void callback(char* topic, byte* message, unsigned int length) {
   
 
   if(messageTemp.substring(0,5)=="SHORT"){ //for modes that do an animation, then return to previous (so they don't interrupt dynam
+    int tempStorage[stripLength][3];
+    for(uint16_t i=0; i<stripLength; i++) {
+      uint8_t LEDr =(strip.getPixelColor(i) >> 16);
+      uint8_t LEDg =(strip.getPixelColor(i) >> 8);
+      uint8_t LEDb =(strip.getPixelColor(i)) ;
+      tempStorage[i][0]=LEDr;
+      tempStorage[i][1]=LEDg;
+      tempStorage[i][2]=LEDb;
+    }
+    
     if(messageTemp.substring(5)=="thayne"){
-      
+      for(int i=0;i<10;i++){
+        int col=random(0,3);
+        if(col==0){
+          for(int i=0;i<stripLength;i++){
+            stripUpdate(i,255,0,0);
+          }
+          strip.show();
+        }else if(col==1){
+          for(int i=0;i<stripLength;i++){
+            stripUpdate(i,0,0,255);
+          }
+          strip.show();
+        }else{
+          for(int i=0;i<stripLength;i++){
+            stripUpdate(i,255,255,255);
+          }
+          strip.show();
+        }
+        delay(60);
+      }
+    }
+
+    //return strip to previous state (fade out then in)
+    for(int i=255;i>0;i--){
+      if(i%5==0){
+        strip.setBrightness(i);
+        strip.show();
+        if(stripLength==18){
+          delay(25);
+        }else{
+         delay(5); 
+      }
+      }
+    }
+    for(int i=0;i<255;i++){
+      if(i%5==0){
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.setBrightness(i);
+        strip.show();
+        if(stripLength==18){
+          delay(25);
+        }else{
+         delay(5); 
+      }
+      }
     }
   }
 
@@ -552,7 +606,7 @@ void callback(char* topic, byte* message, unsigned int length) {
     }else if(messageTemp.substring(5)=="fade"){
       dynamMode=4;
     }
-  }else if (messageTemp.substring(0,5)!="PULSE"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
+  }else if (messageTemp.substring(0,5)!="PULSE" && messageTemp.substring(0,5)!="SHORT"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
     dynamMode=0; 
   }
   
