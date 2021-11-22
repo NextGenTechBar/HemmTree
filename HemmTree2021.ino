@@ -75,7 +75,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.114"
+  "0.115"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -319,7 +319,11 @@ void callback(char* topic, byte* message, unsigned int length) {
     for(int i=0; i<stripLength; i++) {
       //strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
       stripUpdate(i,stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]);
-      delay(5);
+      if(stripLength==18){
+        delay(25);
+      }else{
+       delay(5); 
+      }
       strip.show();
     }
 /*
@@ -349,10 +353,29 @@ void callback(char* topic, byte* message, unsigned int length) {
         int green=messageTemp.substring(8+k*msgLen,11+k*msgLen).toInt(); //green
         int blue=messageTemp.substring(11+k*msgLen,14+k*msgLen).toInt(); //blue
         stripUpdate(i,red,green,blue);
-
-        delay(5);
+        if(stripLength==18){
+          delay(25);
+        }else{
+         delay(5); 
+        }
         strip.show();
       }
+    }
+  }
+
+  if(messageTemp.substring(0,5)=="OTHER"){ //things that don't fit in to other categories, like random that is technically a static pattern, but is generated locally
+    if(messageTemp.substring(5)=="random"){
+      for(int i=0;i<stripLength;i++){
+        stripUpdate(i,random(0,255),random(0,255),random(0,255));
+        strip.show();
+        if(stripLength==18){
+          delay(25);
+        }else{
+         delay(5); 
+        }
+      }
+      
+      
     }
   }
 
@@ -433,6 +456,13 @@ void rainbow(){
   for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
     int pixelHue = mode1firstPixelHue + (i * 65536L / strip.numPixels());
     strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+    if(setupMode){ //if it's the first time, incrementally set strip to rainbow colors as a transition
+      if(stripLength==18){
+          delay(25);
+        }else{
+         delay(5); 
+        }
+    }
   }
   strip.show(); // Update strip with new contents
   delay(11);  // Pause for a moment
