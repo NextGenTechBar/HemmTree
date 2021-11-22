@@ -76,7 +76,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.122"
+  "0.123"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -597,6 +597,36 @@ void callback(char* topic, byte* message, unsigned int length) {
         tempStorage[i][1]=LEDg;
         tempStorage[i][2]=LEDb;
       }
+
+      if(messageTemp.substring(5)=="invalid"){
+        for(int i=0;i<2;i++){
+          for(int i=255;i>0;i--){
+            if(i%10==0){
+              strip.setBrightness(i);
+              strip.show();
+              if(stripLength==18){
+                delay(10);
+              }else{
+               delay(2); 
+              }
+            }
+          }
+          for(int i=0;i<255;i++){
+            if(i%10==0){
+              for(int i=0;i<stripLength;i++){
+                stripUpdate(i,255,0,0);
+              }
+              strip.setBrightness(i);
+              strip.show();
+              if(stripLength==18){
+                delay(10);
+              }else{
+               delay(2); 
+              }
+            }
+          }
+        }
+      }
       
       if(messageTemp.substring(5)=="thayne"){
         for(int i=0;i<20;i++){
@@ -627,9 +657,17 @@ void callback(char* topic, byte* message, unsigned int length) {
           strip.setBrightness(i);
           strip.show();
           if(stripLength==18){
-            delay(25);
+            if(messageTemp.substring(5)=="invalid"){
+              delay(10);
+            }else{
+              delay(25);
+            }
           }else{
-           delay(5); 
+           if(messageTemp.substring(5)=="invalid"){
+            delay(2); 
+           }else{
+            delay(5); 
+           }
         }
         }
       }
