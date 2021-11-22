@@ -75,7 +75,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.115"
+  "0.116"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -459,9 +459,10 @@ void rainbow(){
     if(setupMode){ //if it's the first time, incrementally set strip to rainbow colors as a transition
       if(stripLength==18){
           delay(25);
-        }else{
+      }else{
          delay(5); 
-        }
+      }
+      strip.show();
     }
   }
   strip.show(); // Update strip with new contents
