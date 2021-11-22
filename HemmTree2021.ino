@@ -76,7 +76,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.12"
+  "0.121"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -388,160 +388,201 @@ void callback(char* topic, byte* message, unsigned int length) {
           }
         }
       }
-  
-        if(messageTemp.substring(5)=="fred"){
-          int numColors=3;
-          int msgLen=9;
-          messageTemp="-----000000255255000000255255000";
-          for(int k=0;k<numColors;k++){ //each block of colors
-            for(int i=k*stripLength/numColors;i<(k+1)*stripLength/numColors;i++){
-              int red=messageTemp.substring(5+k*msgLen,8+k*msgLen).toInt(); //red
-              int green=messageTemp.substring(8+k*msgLen,11+k*msgLen).toInt(); //green
-              int blue=messageTemp.substring(11+k*msgLen,14+k*msgLen).toInt(); //blue
-              stripUpdate(i,red,green,blue);
-              if(stripLength==18){
-                delay(59);
-              }else{
-               delay(5); 
-              }
-              strip.show();
-            }
+
+      if(messageTemp.substring(5)=="differentcolors"){
+        int red;
+        int green;
+        int blue;
+        if(random(0,4)==0){ //25% of the time
+          red = random(30,220);
+        }else{
+          if(random(0,2)==0){
+            red = random(0,30);  
+          }else{
+            red = random(220,255);
           }
-  
-          int tempStorage[stripLength][3];
-          for(uint16_t i=0; i<stripLength; i++) {
-            uint8_t LEDr =(strip.getPixelColor(i) >> 16);
-            uint8_t LEDg =(strip.getPixelColor(i) >> 8);
-            uint8_t LEDb =(strip.getPixelColor(i)) ;
-            tempStorage[i][0]=LEDr;
-            tempStorage[i][1]=LEDg;
-            tempStorage[i][2]=LEDb;
-          }
-          delay(1000);
-          strip.clear();
-          strip.show();
-  
-          delay(1000);
-          int charDelay=30;
-          int letterDelay=300;
-          int dashDelay=700;
-          int dotDelay=400;
-  
-          //t
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-  
-          strip.clear();
-          strip.show();
-          delay(letterDelay);
-  
-          //b
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-          
-          strip.clear();
-          strip.show();
-          delay(letterDelay);
-  
-          //i
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-  
-          strip.clear();
-          strip.show();
-          delay(letterDelay);
-  
-          //y
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-          
-          strip.clear();
-          strip.show();
-          delay(letterDelay);
-  
-          //t
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-  
-          strip.clear();
-          strip.show();
-          delay(letterDelay);
-  
-          //c
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dashDelay);
-          strip.clear();
-          strip.show();
-          delay(charDelay);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
-          delay(dotDelay);
-          strip.clear();
-          strip.show();
-          delay(2000);
-          for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
-          strip.show();
         }
+        if(random(0,4)==0){ //25% of the time
+          green = random(30,220);
+        }else{
+          if(random(0,2)==0){
+            green = random(0,30);  
+          }else{
+            green = random(220,255);
+          }
+        }
+        if(random(0,4)==0){ //25% of the time
+          blue = random(30,220);
+        }else{
+          if(random(0,2)==0){
+            blue = random(0,30);  
+          }else{
+            blue = random(220,255);
+          }
+        }
+        for(int i=0;i<stripLength;i++){
+          stripUpdate(i,red,green,blue);
+          if(stripLength==18){
+            delay(25);
+          }else{
+           delay(5); 
+          }
+        }
+      }
+  
+      if(messageTemp.substring(5)=="fred"){
+        int numColors=3;
+        int msgLen=9;
+        messageTemp="-----000000255255000000255255000";
+        for(int k=0;k<numColors;k++){ //each block of colors
+          for(int i=k*stripLength/numColors;i<(k+1)*stripLength/numColors;i++){
+            int red=messageTemp.substring(5+k*msgLen,8+k*msgLen).toInt(); //red
+            int green=messageTemp.substring(8+k*msgLen,11+k*msgLen).toInt(); //green
+            int blue=messageTemp.substring(11+k*msgLen,14+k*msgLen).toInt(); //blue
+            stripUpdate(i,red,green,blue);
+            if(stripLength==18){
+              delay(59);
+            }else{
+             delay(5); 
+            }
+            strip.show();
+          }
+        }
+
+        int tempStorage[stripLength][3];
+        for(uint16_t i=0; i<stripLength; i++) {
+          uint8_t LEDr =(strip.getPixelColor(i) >> 16);
+          uint8_t LEDg =(strip.getPixelColor(i) >> 8);
+          uint8_t LEDb =(strip.getPixelColor(i)) ;
+          tempStorage[i][0]=LEDr;
+          tempStorage[i][1]=LEDg;
+          tempStorage[i][2]=LEDb;
+        }
+        delay(1000);
+        strip.clear();
+        strip.show();
+
+        delay(1000);
+        int charDelay=30;
+        int letterDelay=300;
+        int dashDelay=700;
+        int dotDelay=400;
+
+        //t
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+
+        strip.clear();
+        strip.show();
+        delay(letterDelay);
+
+        //b
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+        
+        strip.clear();
+        strip.show();
+        delay(letterDelay);
+
+        //i
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+
+        strip.clear();
+        strip.show();
+        delay(letterDelay);
+
+        //y
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+        
+        strip.clear();
+        strip.show();
+        delay(letterDelay);
+
+        //t
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+
+        strip.clear();
+        strip.show();
+        delay(letterDelay);
+
+        //c
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dashDelay);
+        strip.clear();
+        strip.show();
+        delay(charDelay);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+        delay(dotDelay);
+        strip.clear();
+        strip.show();
+        delay(2000);
+        for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
+        strip.show();
+      }
       }
     
   
@@ -575,7 +616,7 @@ void callback(char* topic, byte* message, unsigned int length) {
             }
             strip.show();
           }
-          delay(75);
+          delay(120);
         }
       }
   
