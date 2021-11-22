@@ -75,7 +75,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.116"
+  "0.117"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -273,7 +273,7 @@ void callback(char* topic, byte* message, unsigned int length) {
       for(int fadeOut=255;fadeOut>0;fadeOut--){
         if(fadeOut%5==0){
           for(int i=0;i<stripLength;i++){
-            stripUpdate(i, stringUpdate[i][0]*fadeOut/255.0,stringUpdate[i][1]*fadeOut/255.0,stringUpdate[i][2]*fadeOut/255.0);
+            strip.setPixelColor(i, strip.Color(stringUpdate[i][0]*fadeOut/255.0,stringUpdate[i][1]*fadeOut/255.0,stringUpdate[i][2]*fadeOut/255.0)); //DO NOT use stripUpdate(), it will swap colors incorrectly
           }
           strip.show();
           delay(speedFactorCourse);
@@ -285,7 +285,7 @@ void callback(char* topic, byte* message, unsigned int length) {
         if(fadeOn%5==0){
           strip.setBrightness(fadeOn);
           for(int i=0;i<stripLength;i++){
-            stripUpdate(i, stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]);
+            strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
           }
           strip.show();
           delay(speedFactorCourse);
@@ -363,7 +363,7 @@ void callback(char* topic, byte* message, unsigned int length) {
     }
   }
 
-  if(messageTemp.substring(0,5)=="OTHER"){ //things that don't fit in to other categories, like random that is technically a static pattern, but is generated locally
+  if(messageTemp.substring(0,5)=="OTHER"){ //modes that have parts generated/animated locally, but end static
     if(messageTemp.substring(5)=="random"){
       for(int i=0;i<stripLength;i++){
         stripUpdate(i,random(0,255),random(0,255),random(0,255));
@@ -374,7 +374,56 @@ void callback(char* topic, byte* message, unsigned int length) {
          delay(5); 
         }
       }
+    }
+
+      if(messageTemp.substring(5)=="fred"){
+        int numColors=3;
+        int msgLen=9;
+        messageTemp="-----000000255255000000255255000";
+        for(int k=0;k<numColors;k++){ //each block of colors
+          for(int i=k*stripLength/numColors;i<(k+1)*stripLength/numColors;i++){
+            int red=messageTemp.substring(5+k*msgLen,8+k*msgLen).toInt(); //red
+            int green=messageTemp.substring(8+k*msgLen,11+k*msgLen).toInt(); //green
+            int blue=messageTemp.substring(11+k*msgLen,14+k*msgLen).toInt(); //blue
+            stripUpdate(i,red,green,blue);
+            if(stripLength==18){
+              delay(50);
+            }else{
+             delay(5); 
+            }
+            strip.show();
+          }
+        }
+
+        int tempStorage[stripLength][3];
+        for(uint16_t i=0; i<stripLength; i++) {
+          uint8_t LEDr =(strip.getPixelColor(i) >> 16);
+          uint8_t LEDg =(strip.getPixelColor(i) >> 8);
+          uint8_t LEDb =(strip.getPixelColor(i)) ;
+          tempStorage[i][0]=LEDr;
+          tempStorage[i][1]=LEDg;
+          tempStorage[i][2]=LEDb;
+        }
+
+        strip.clear();
+        strip.show();
+
+        delay(1000);
+
+        for(int i=0;i<stripLength;i++){
+          stripUpdate(i, tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]);
+        }
+        strip.show();
+        
+        
+      }
       
+      
+    }
+  
+
+  if(messageTemp.substring(0,5)=="SHORT"){ //for modes that do an animation, then return to previous (so they don't interrupt dynam
+    if(messageTemp.substring(5)=="thayne"){
       
     }
   }
