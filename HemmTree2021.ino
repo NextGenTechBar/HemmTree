@@ -78,7 +78,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.126"
+  "0.127"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -88,24 +88,28 @@ int FirmwareVersionCheck();
 void stripUpdate();
 
 void setup() {
+  Serial.begin(115200);
+  
   pinMode(15,INPUT_PULLUP);
-  pinMode(2,INPUT_PULLUP);
-  if(!digitalRead(2)){ //BRG if D2 is grounded (or D2 AND D15)
+  pinMode(4,INPUT_PULLUP);
+  if(digitalRead(4)==0){ //BRG if D2 is grounded (or D2 AND D15)
     BRG=true;
     RGB=false;
     GRB=false;
-  }else if(!digitalRead(15)){ //GRB if D15 is grounded (and D2 IS NOT)
+    Serial.println("BRG");
+  }else if(digitalRead(15)==0){ //GRB if D15 is grounded (and D2 IS NOT)
     BRG=false;
     RGB=false;
     GRB=true;
+    Serial.println("GRB");
   }else{ //RGB if no extra connections are made
     BRG=false;
     RGB=true;
     GRB=false;
+    Serial.println("RGB");
   }
   
   
-  Serial.begin(115200);
   randomSeed(analogRead(35));
 
   deviceMacAddress = WiFi.macAddress();
