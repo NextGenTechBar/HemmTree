@@ -78,7 +78,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.127"
+  "0.128"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -92,7 +92,7 @@ void setup() {
   
   pinMode(15,INPUT_PULLUP);
   pinMode(4,INPUT_PULLUP);
-  if(digitalRead(4)==0){ //BRG if D2 is grounded (or D2 AND D15)
+  if(digitalRead(4)==0){ //BRG if D4 is grounded (or D2 AND D15)
     BRG=true;
     RGB=false;
     GRB=false;
@@ -224,7 +224,7 @@ void stripUpdate(int pixel,int r,int g,int b){
   }else if(GRB){
     strip.setPixelColor(pixel, strip.Color(g,r,b));
   }else if(BRG){
-    strip.setPixelColor(pixel, strip.Color(b,r,g));
+    strip.setPixelColor(pixel, strip.Color(r,b,g));
   }
 }
 
