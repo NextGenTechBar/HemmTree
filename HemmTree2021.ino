@@ -78,7 +78,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.128"
+  "0.129"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -411,6 +411,37 @@ void callback(char* topic, byte* message, unsigned int length) {
         }
       }
 
+      if(messageTemp.substring(5)=="grinch"){
+        for(int i=0;i<stripLength;i++){
+          if(random(0,8)==0){
+            stripUpdate(i,0,255,0);
+            if(stripLength==18){
+              delay(25);
+            }else{
+             delay(5); 
+            }
+            strip.show();
+            stripUpdate(i+1,0,255,0);
+            if(stripLength==18){
+              delay(25);
+            }else{
+             delay(5); 
+            }
+            strip.show();
+            stripUpdate(i+2,0,255,0);
+            i=i+2;
+          }else{
+            stripUpdate(i,0,0,0);
+          }
+          if(stripLength==18){
+            delay(25);
+          }else{
+           delay(5); 
+          }
+          strip.show();
+        }
+      }
+
       if(messageTemp.substring(5)=="differentcolors"){
         int red;
         int green;
@@ -463,6 +494,54 @@ void callback(char* topic, byte* message, unsigned int length) {
                delay(5); 
             }
             strip.show();
+        }
+      }
+
+      if(messageTemp.substring(5)=="kaitlyn"){
+        int red=0;
+        int blue=0;
+        int green=0;
+        for(int x=0;x<3;x++){
+          if(x==0){
+            red=255;
+            green=255;
+            blue=0;
+          }else if(x==1){
+            red=255;
+            green=0;
+            blue=255;
+          }else if(x==2){
+            red=0;
+            green=255;
+            blue=255;
+          }
+          for(int i=0;i<stripLength;i++){
+            stripUpdate(i,red,green,blue);
+            if(stripLength==18){delay(59);}else{delay(5);}
+            strip.show();
+          }
+          for(int i=stripLength;i>=0;i--){
+            stripUpdate(i,0,0,0);
+            if(stripLength==18){delay(59);}else{delay(5);}
+            strip.show();
+          }
+        }
+        int numColors=3;
+        int msgLen=9;
+        messageTemp="-----255255000255000255000255255000000255";
+        for(int k=0;k<numColors;k++){ //each block of colors
+          for(int i=k*stripLength/numColors;i<(k+1)*stripLength/numColors;i++){
+            int red=messageTemp.substring(5+k*msgLen,8+k*msgLen).toInt(); //red
+            int green=messageTemp.substring(8+k*msgLen,11+k*msgLen).toInt(); //green
+            int blue=messageTemp.substring(11+k*msgLen,14+k*msgLen).toInt(); //blue
+            stripUpdate(i,red,green,blue);
+            if(stripLength==18){
+              delay(59);
+            }else{
+             delay(5); 
+            }
+            strip.show();
+          }
         }
       }
   
@@ -683,6 +762,16 @@ void callback(char* topic, byte* message, unsigned int length) {
             strip.show();
           }
           delay(120);
+        }
+      }
+
+      if(messageTemp.substring(5)=="jordan"){
+        for(int k=0;k<20;k++){
+          for(int i=0;i<stripLength;i++){
+            stripUpdate(i,random(0,255),random(0,255),random(0,255));
+          }
+          delay(120);
+          strip.show();
         }
       }
   
