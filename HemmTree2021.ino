@@ -68,7 +68,9 @@ int mode3directionR=1; //1 is up, -1 is down
 int mode3directionG=1;
 int mode3directionB=1;
 
-bool RGB; //in setup() check if D15 is grounded, if so, use GRB formatting, otherwise, use RGB
+bool RGB; //logic in setup() for which strip type to use
+bool GRB;
+bool BRG;
 bool acceptingInput=true;
 
 // LED Pin
@@ -76,7 +78,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.125"
+  "0.126"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -87,7 +89,21 @@ void stripUpdate();
 
 void setup() {
   pinMode(15,INPUT_PULLUP);
-  RGB=digitalRead(15);
+  pinMode(2,INPUT_PULLUP);
+  if(!digitalRead(2)){ //BRG if D2 is grounded (or D2 AND D15)
+    BRG=true;
+    RGB=false;
+    GRB=false;
+  }else if(!digitalRead(15)){ //GRB if D15 is grounded (and D2 IS NOT)
+    BRG=false;
+    RGB=false;
+    GRB=true;
+  }else{ //RGB if no extra connections are made
+    BRG=false;
+    RGB=true;
+    GRB=false;
+  }
+  
   
   Serial.begin(115200);
   randomSeed(analogRead(35));
@@ -201,8 +217,10 @@ void setup() {
 void stripUpdate(int pixel,int r,int g,int b){
   if(RGB){
     strip.setPixelColor(pixel, strip.Color(r,g,b));
-  }else{
+  }else if(GRB){
     strip.setPixelColor(pixel, strip.Color(g,r,b));
+  }else if(BRG){
+    strip.setPixelColor(pixel, strip.Color(b,r,g));
   }
 }
 
