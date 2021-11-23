@@ -76,7 +76,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.124"
+  "0.125"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -115,7 +115,7 @@ void setup() {
   EEPROM.write(address, boardId);//EEPROM.put(address, boardId);
   address += sizeof(boardId); //update address value
 
-  float param = 120; // CHANGE THIS VALUE TO WHAT YOU WANT THE STRING LENGTH TO BEEEEEEEEEEEEEEEEEEEEEEEE
+  float param = 100; // CHANGE THIS VALUE TO WHAT YOU WANT THE STRING LENGTH TO BEEEEEEEEEEEEEEEEEEEEEEEE
   EEPROM.writeFloat(address, param);//EEPROM.put(address, param);
   EEPROM.commit();
   address = 0;
@@ -428,6 +428,19 @@ void callback(char* topic, byte* message, unsigned int length) {
           }else{
            delay(5); 
           }
+        }
+      }
+
+      if(messageTemp.substring(5)=="rainbow"){ //stationary rainbow. different from animation of rainbow
+        for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
+          int pixelHue = 0 + (i * 65536L / strip.numPixels());
+          strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+            if(stripLength==18){
+                delay(25);
+            }else{
+               delay(5); 
+            }
+            strip.show();
         }
       }
   
