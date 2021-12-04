@@ -83,7 +83,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.131"
+  "0.132"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -218,7 +218,6 @@ void setup() {
   Serial.println(FirmwareVer);
   Serial.println("Will now check for new firmware..");
 
-  //client.publish("GUHemmTreeBootLog",deviceMacAddress.c_str());
   
   if (FirmwareVersionCheck()) {
       firmwareUpdate();
@@ -1049,10 +1048,10 @@ void pulses(){
     
     //In the future: fade off
   }
-  int speedFactorCourse=20;
+  int speedFactorCourse=50;
   int speedFactorFine=0;
   if(stripLength==18){ //slow down for shorter strips so longer ones can keep up
-    speedFactorCourse=35;
+    speedFactorCourse=50;
     speedFactorFine=739;  
   }
 
