@@ -83,7 +83,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.132"
+  "0.133"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1045,13 +1045,20 @@ void pulses(){
     mode3r = constrain(random(0,255),0,255); //keep within range if it goes outside
     mode3g = constrain(random(0,255),0,255);
     mode3b = constrain(random(0,255),0,255);
+
+    //for(int i=0;i<stripLength;i++){
+      //strip.setPixelColor(i,strip.Color(mode3r,mode3g,mode3b));
+      
+    //}
     
     //In the future: fade off
   }
-  int speedFactorCourse=50;
+
+  
+  int speedFactorCourse=random(48,52);
   int speedFactorFine=0;
   if(stripLength==18){ //slow down for shorter strips so longer ones can keep up
-    speedFactorCourse=50;
+    speedFactorCourse=random(48,52);
     speedFactorFine=739;  
   }
 
