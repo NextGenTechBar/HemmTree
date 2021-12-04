@@ -68,17 +68,22 @@ int mode3directionR=1; //1 is up, -1 is down
 int mode3directionG=1;
 int mode3directionB=1;
 
+bool mode4PulseOn=true;
+int mode4ctr=0;
+
 bool RGB; //logic in setup() for which strip type to use
 bool GRB;
 bool BRG;
 bool acceptingInput=true;
+
+bool justBooted=true;
 
 // LED Pin
 const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.129"
+  "0.131"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -165,6 +170,7 @@ void setup() {
 
   EEPROM.end();
   //strip = Adafruit_NeoPixel(150, PIN, NEO_GRB + NEO_KHZ800);
+  //stripLength=18; //temporary hard coded length
   strip.updateType(NEO_GRB + NEO_KHZ800);
   strip.setPin(PIN);
   strip.updateLength(stripLength);
@@ -211,6 +217,9 @@ void setup() {
   Serial.print("Active firmware version:");
   Serial.println(FirmwareVer);
   Serial.println("Will now check for new firmware..");
+
+  //client.publish("GUHemmTreeBootLog",deviceMacAddress.c_str());
+  
   if (FirmwareVersionCheck()) {
       firmwareUpdate();
     }
@@ -502,18 +511,18 @@ void callback(char* topic, byte* message, unsigned int length) {
         int blue=0;
         int green=0;
         for(int x=0;x<3;x++){
-          if(x==0){
+          if(x==0){ //purple
+            red=128;
+            green=0;
+            blue=128;
+          }else if(x==1){ //blue
+            red=0;
+            green=0;
+            blue=255;
+          }else if(x==2){ //yellow
             red=255;
             green=255;
             blue=0;
-          }else if(x==1){
-            red=255;
-            green=0;
-            blue=255;
-          }else if(x==2){
-            red=0;
-            green=255;
-            blue=255;
           }
           for(int i=0;i<stripLength;i++){
             stripUpdate(i,red,green,blue);
@@ -818,6 +827,8 @@ void callback(char* topic, byte* message, unsigned int length) {
         dynamMode=3;    
       }else if(messageTemp.substring(5)=="fade"){
         dynamMode=4;
+      }else if(messageTemp.substring(5)=="pulses"){
+        dynamMode=5;
       }
     }else if (messageTemp.substring(0,5)!="PULSE" && messageTemp.substring(0,5)!="SHORT"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
       dynamMode=0; 
@@ -850,6 +861,12 @@ void reconnect() {
 void loop() {
   if (!client.connected()) {
     reconnect();
+    if(justBooted && client.connected()){
+      client.publish("GUHemmTreeBootLog",deviceMacAddress.c_str()); //only do this the first time
+      justBooted=false;
+    }else if(!justBooted && client.connected()){
+      client.publish("GUHemmTreeReconnectLog",deviceMacAddress.c_str()); //do this any time we were reconnecting and re-established connection
+    }
   }
   client.loop(); //checks for new MQTT msg
 
@@ -871,6 +888,8 @@ void loop() {
     chase();
   }else if(dynamMode==4){
     fade();
+  }else if(dynamMode==5){
+    pulses();
   }
   
 
@@ -1018,6 +1037,64 @@ void fade(){
   }
   strip.show();
   delay(20);
+}
+
+void pulses(){
+  if(setupMode){
+    mode4ctr=255;
+    mode4PulseOn=false; //fade off first
+    mode3r = constrain(random(0,255),0,255); //keep within range if it goes outside
+    mode3g = constrain(random(0,255),0,255);
+    mode3b = constrain(random(0,255),0,255);
+    
+    //In the future: fade off
+  }
+  int speedFactorCourse=20;
+  int speedFactorFine=0;
+  if(stripLength==18){ //slow down for shorter strips so longer ones can keep up
+    speedFactorCourse=35;
+    speedFactorFine=739;  
+  }
+
+
+  if (mode4PulseOn){ //if we're fading on not off
+    
+    if(mode4ctr<255){
+      if(mode4ctr%5==0){
+        strip.setBrightness(mode4ctr);
+        for(int i=0;i<stripLength;i++){
+          strip.setPixelColor(i, strip.Color(mode3r*mode4ctr/255.0,mode3g*mode4ctr/255.0,mode3b*mode4ctr/255.0));
+        }
+        strip.show();
+        delay(speedFactorCourse);
+        delayMicroseconds(speedFactorFine);
+      }
+      mode4ctr++;
+    }else{
+      mode4ctr=255;
+      mode4PulseOn=false;
+    }
+    
+  }else{ //if we're fading off not on
+    if(mode4ctr>-1){
+      if(mode4ctr%5==0){
+        for(int i=0;i<stripLength;i++){
+          strip.setPixelColor(i, strip.Color(mode3r*mode4ctr/255.0,mode3g*mode4ctr/255.0,mode3b*mode4ctr/255.0));
+        }
+        strip.show();
+        delay(speedFactorCourse);
+        delayMicroseconds(speedFactorFine);
+      }
+      mode4ctr--;
+    }else{
+      mode4PulseOn=true;
+      mode4ctr=0;
+      mode3r = constrain(random(0,255),0,255); //keep within range if it goes outside
+      mode3g = constrain(random(0,255),0,255);
+      mode3b = constrain(random(0,255),0,255);
+    }
+  }
+  
 }
 
 
