@@ -84,7 +84,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.134"
+  "0.135"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1049,12 +1049,18 @@ void pulses(){
 
     mode4SpeedFactor=random(48,52);
 
-    //for(int i=0;i<stripLength;i++){
-      //strip.setPixelColor(i,strip.Color(mode3r,mode3g,mode3b));
-      
-    //}
-    
-    //In the future: fade off
+    for(int i=0; i<stripLength; i++) {
+      //strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
+      stripUpdate(i,mode3r,mode3g,mode3b);
+      if(stripLength==18){
+        delay(25);
+      }else{
+       delay(5); 
+      }
+      strip.show();
+    }
+
+    delay(random(0,4000)); //initialize ornaments at different times so they're out of phase
   }
 
   
