@@ -70,6 +70,7 @@ int mode3directionB=1;
 
 bool mode4PulseOn=true;
 int mode4ctr=0;
+int mode4SpeedFactor;
 
 bool RGB; //logic in setup() for which strip type to use
 bool GRB;
@@ -83,7 +84,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.133"
+  "0.134"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1046,6 +1047,8 @@ void pulses(){
     mode3g = constrain(random(0,255),0,255);
     mode3b = constrain(random(0,255),0,255);
 
+    mode4SpeedFactor=random(48,52);
+
     //for(int i=0;i<stripLength;i++){
       //strip.setPixelColor(i,strip.Color(mode3r,mode3g,mode3b));
       
@@ -1055,12 +1058,8 @@ void pulses(){
   }
 
   
-  int speedFactorCourse=random(48,52);
-  int speedFactorFine=0;
-  if(stripLength==18){ //slow down for shorter strips so longer ones can keep up
-    speedFactorCourse=random(48,52);
-    speedFactorFine=739;  
-  }
+  int speedFactorCourse=mode4SpeedFactor;
+  int speedFactorFine=739;
 
 
   if (mode4PulseOn){ //if we're fading on not off
