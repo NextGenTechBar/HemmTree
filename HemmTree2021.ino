@@ -829,6 +829,8 @@ void callback(char* topic, byte* message, unsigned int length) {
         dynamMode=4;
       }else if(messageTemp.substring(5)=="pulses"){
         dynamMode=5;
+      }else if(messageTemp.substring(5)=="twinkle"){
+        dynamMode=6;
       }
     }else if (messageTemp.substring(0,5)!="PULSE" && messageTemp.substring(0,5)!="SHORT"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
       dynamMode=0; 
@@ -890,6 +892,8 @@ void loop() {
     fade();
   }else if(dynamMode==5){
     pulses();
+  }else if(dynamMode==6){
+    twinkle();
   }
   
 
@@ -1072,7 +1076,7 @@ void pulses(){
     
     if(mode4ctr<255){
       if(mode4ctr%5==0){
-        strip.setBrightness(mode4ctr);
+        //strip.setBrightness(mode4ctr); //don't do this. It gets ornaments stuck at this brightness level
         for(int i=0;i<stripLength;i++){
           strip.setPixelColor(i, strip.Color(mode3r*mode4ctr/255.0,mode3g*mode4ctr/255.0,mode3b*mode4ctr/255.0));
         }
@@ -1106,6 +1110,74 @@ void pulses(){
     }
   }
   
+}
+
+void twinkle(){  //BROKEN! Works at first, but then if you do a SHORT mode, it breaks until a reboot
+  if(setupMode){
+    for(int i=0; i<stripLength; i++) {
+      stripUpdate(i,random(2,253),random(2,253),random(2,253));
+      if(stripLength==18){
+        delay(25);
+      }else{
+       delay(5); 
+      }
+      strip.show();
+    }
+  }
+
+
+  for(int i=0;i<stripLength;i++){
+    uint8_t ra =(strip.getPixelColor(i) >> 16);
+    uint8_t ga =(strip.getPixelColor(i) >> 8);
+    uint8_t ba =(strip.getPixelColor(i));
+
+    int r=ra;
+    int g=ga;
+    int b=ba;
+    
+    if(r%2==0){ //if even, go up
+      r+=2;
+      if(i==0){
+        Serial.println(r);
+      }
+    }else{ //if odd, go down
+      r-=2;
+    }
+    if(g%2==0){ //if even, go up
+      g+=2;
+    }else{ //if odd, go down
+      g-=2;
+    }
+    if(b%2==0){ //if even, go up
+      b+=2;
+    }else{ //if odd, go down
+      b-=2;
+    }
+
+    int dirSwitch=20;
+    if(random(0,dirSwitch)==0){ //certain percentage of the time, add 1 which switches the direction
+      r++;
+    }
+    if(random(0,dirSwitch)==0){
+      g++;
+    }
+    if(random(0,dirSwitch)==0){
+      b++;
+    }
+
+    r = constrain(r,2,253); //keep within range if it goes outside (NOT 0 to 255)
+    g = constrain(g,2,253);
+    b = constrain(b,2,253);
+
+/*
+    if(i==0){
+      Serial.println(r);
+    }
+*/
+    strip.setPixelColor(i,strip.Color(r,g,b));
+  }
+  strip.show();
+  delay(5);
 }
 
 
