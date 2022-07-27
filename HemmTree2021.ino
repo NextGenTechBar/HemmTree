@@ -1,8 +1,3 @@
-/*********
-  Rui Santos
-  Complete project details at https://randomnerdtutorials.com  
-*********/
-
 #include <WiFi.h>
 #include <PubSubClient.h>
 
@@ -10,7 +5,7 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <WiFiClientSecure.h>
-#include "cert.h"
+//#include "cert.h" //no longer necessary with setInsecure()
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -24,8 +19,8 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(); //length, etc is read from eeprom
 int stripLength=0;
 
 // Replace the next variables with your SSID/Password combination
-const char* ssid = "Gonzaga Guest"; //CenturyLink3314
-const char* password = ""; //buet2kpjnnbtw9
+const char* ssid = "StartideRising"; //CenturyLink3314
+const char* password = "3arthClan2book"; //buet2kpjnnbtw9
 String deviceMacAddress;
 
 int dynamMode=0; //MQTT message can set this variable. loop() checks it each animation step to know what mode to be in
@@ -1184,7 +1179,9 @@ void twinkle(){  //BROKEN! Works at first, but then if you do a SHORT mode, it b
 //GITHUB FIRMWARE UPDATE
 void firmwareUpdate(void) {
   WiFiClientSecure client;
-  client.setCACert(rootCACertificate);
+  //WiFiClientSecure * client = new WiFiClientSecure;
+  //client.setCACert(rootCACertificate);
+  client.setInsecure(); //prevents having the update the CA certificate periodically (it expiring breaks github updates which SUCKS cause you have to update each ornament manually with the new certificate
   httpUpdate.setLedPin(LED_BUILTIN, LOW);
   t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
 
@@ -1214,7 +1211,8 @@ int FirmwareVersionCheck(void) {
 
   if (client) 
   {
-    client -> setCACert(rootCACertificate);
+    //client -> setCACert(rootCACertificate);
+    client->setInsecure(); //prevents having the update the CA certificate periodically (it expiring breaks github updates which SUCKS cause you have to update each ornament manually with the new certificate
 
     // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is 
     HTTPClient https;
