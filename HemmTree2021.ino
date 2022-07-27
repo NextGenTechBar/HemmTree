@@ -19,8 +19,10 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(); //length, etc is read from eeprom
 int stripLength=0;
 
 // Replace the next variables with your SSID/Password combination
-const char* ssid = "StartideRising"; //CenturyLink3314
-const char* password = "3arthClan2book"; //buet2kpjnnbtw9
+//const char* ssid = "StartideRising"; //CenturyLink3314
+//const char* password = "3arthClan2book"; //buet2kpjnnbtw9
+const char* ssid = "Gonzaga Guest";
+const char* password = "";
 String deviceMacAddress;
 
 int dynamMode=0; //MQTT message can set this variable. loop() checks it each animation step to know what mode to be in
