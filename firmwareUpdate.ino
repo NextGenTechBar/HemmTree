@@ -25,6 +25,7 @@ void setup() {
   Serial.print("Connecting to ");
   Serial.println(ssid);
 
+  WiFi.persistent(false); //don't save configuration to flash, otherwise it won't start a captive portal which lets the user set the strip length on next boot of real firmware
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
