@@ -22,14 +22,7 @@ This assumes you already have the Arduino IDE installed with ESP32 boards. If no
   </li>
 </ol>
 
-
-HOW TO CHANGE STRIP LENGTH WHEN IN RANGE OF NETWORK
-
-  1) <b>Setting the number of LEDs this ESP will run (optional)</b><br>
-        If you skip this step, the ESP will use the default strip length as specified in the code. If you would like to use a different strip length, download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP. The strip length is now set in ROM.
-  2) <b>Flashing the initial ESP code</b><br>
-        Download HemmTree2021.ino, place it in the same directory as cert.h and upload it to the ESP32 over USB. It will now check for firmware updates from this repository each boot.
-  
+<p></p>
 
 ### FIRMWARE UPDATES
   1) Modifying the code
@@ -40,6 +33,12 @@ HOW TO CHANGE STRIP LENGTH WHEN IN RANGE OF NETWORK
         Update the number in the file code_version.txt in this repository to reflect the number you just incremented FirmwareVer to in the code.
   4) Commanding the firmware update
         At the next reboot, each ESP32 will compare the current FirmwareVer number to the one on GitHub, then download and flash the new .bin file if the GitHub number is greater than the local one. If you would like to issue a firmware update immediately, you can send the command 'FIRMWARE_UPDATE' to the topic ('GUHemmTree' at the time of writing), over MQTT and this will instruct all online ESP32s to check for a new firmware version. Note: you can manually issue MQTT instructions via http://www.hivemq.com/demos/websocket-client/
+        
+
+### CHANGING STRIP LENGTH
+
+The strip length (number of series LEDs on each individual ornament) can be updated individually on each ESP32 thorugh the configuration portal. However, the configuration portal is only launched when the ESP32 fails to connect to wifi. Therefore, the portal can be launched by booting the ESP32 outside of range of the saved wifi network. If this is not feasible, you can update the strip length as follows:
+<br>Download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP32 (if you are having difficulties with this step, see the note at the begining of "initial setup" instructions). The new strip length is now set in EEPROM. After this, you can follow the above instructions for "INITIAL SETUP" to put the HemmTree code back on the ESP32.
 
 <b>USAGE</b><br>
 At the time of writing, the webserver/python code does not exist yet. But in general, all ESP32s will receive commands via MQTT. At the time of writing, the broker is broker.mqtt-dashboard.comt and the topic is GUHemmTree (you can check the code to verify this). Please check the code for the latest possible commands, but in general, the format is:<br>
