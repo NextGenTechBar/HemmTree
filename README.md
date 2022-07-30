@@ -8,15 +8,22 @@ It is important that all ESPs are identical, otherwise at bootup they will firmw
 This assumes you already have the Arduino IDE installed with ESP32 boards. If not, please follow instructions <a href="https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/">here</a> first. You may also need <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">this</a> driver.
 <ol>
   <li><b>Flashing the initial ESP code</b><br>
-    The full HemmTree2021.ino code has many library dependancies, so it is easiest to flash firmwareUpdate.ino, which has no external dependancies. This code will immediately.... (hold on, better not hard code credentials. or at least not save them
+    The full HemmTree2021.ino code has many library dependancies, so it is easiest to flash firmwareUpdate.ino, which has no external dependancies. This code will connect to wifi and immediately download+install the full code from this repository and reboot. To use it, just change the SSID and password at the top of the sketch to your wifi details. Then upload it to your ESP32. The onboard blue light will flash rapidly to indicate it is downloading the full code.
     <br>[when uploading code, use the board "Node32s"]
+    <br>[If the blue light does not rapidly flash, you have probably entered the wrong WiFi credentials, or the device is stuck in a captive portal]
   </li>
-  <li><b>Another Step</b><br>
-  the instructions
+  <li><b>Connecting to the configuration network</b><br>
+    When the download is finished, the ESP32 will reboot with the full HemmTree code. The LED strip will light up white, and then change to spotted blue (black except every 5th light blue) to indicate that the configuration portal has started. To access it, from your computer or phone, connect to the wifi network called "HemmTree ESP-[MAC]". On most computers and iphones, this will automatically launch a captive portal. On Androids, you may need to go to 192.168.4.1 in your browser.
+    <br>[Note: the configuration portal may not launch if this ESP has been used on an in-range network before. It may connect to that network automatically instead.]
+  </li>
+  <li><b>Selecting wifi network and strip length</b><br>
+    Once the configuration page has loaded, select "Configure WiFi". On the following screen you can select the desired WiFi network and enter the Strip Length, which indicates how many individual series LEDs are on that ornament. Once finished, press save. After a few seconds (assuming valid WiFi credentials were entered), it will connect to that wifi network and begin normal functionality. If it displays spotted orange, the device is likely stuck in a captive portal on your chosen network.
+    <br>From now on, when plugged in this device will automatically connect to the saved wifi network. If that fails at boot, it will launch the configuration network again (as indicated by spotted blue), and you can select a new wifi network.
   </li>
 </ol>
 
 
+HOW TO CHANGE STRIP LENGTH WHEN IN RANGE OF NETWORK
 
   1) <b>Setting the number of LEDs this ESP will run (optional)</b><br>
         If you skip this step, the ESP will use the default strip length as specified in the code. If you would like to use a different strip length, download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP. The strip length is now set in ROM.
