@@ -1,3 +1,8 @@
+/*
+PLEASE NOTE: This functionality is now availible to users without using this script. The option is in the Wifi Configuration portal that launches when the device cannot connect to the saved network.
+This script will still work to update that value if it's easier for you (with this script you can be in range of a known network)
+*/
+
 //Libraries
 #include <EEPROM.h>//https://github.com/espressif/arduino-esp32/tree/master/libraries/EEPROM
 
