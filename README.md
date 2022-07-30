@@ -5,7 +5,7 @@ ESP32 WROOM is used in this project.
 It is important that all ESPs are identical, otherwise at bootup they will firmware update with the compiled binary which may be incompatible with the board.
 
 <b>INITIAL SETUP (done individually for each ESP</b>
-  1) Setting the number of LEDs this ESP will run (optional)
+  1) Setting the number of LEDs this ESP will run (optional)<br>
         If you skip this step, the ESP will use the default strip length as specified in the code. If you would like to use a different strip length, download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP. The strip length is now set in ROM.
   2) Flashing the initial ESP code
         Download HemmTree2021.ino, place it in the same directory as cert.h and upload it to the ESP32 over USB. It will now check for firmware updates from this repository each boot.
