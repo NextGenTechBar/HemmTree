@@ -6,6 +6,7 @@
 #include <HTTPUpdate.h>
 #include <WiFiClientSecure.h>
 //#include "cert.h" //no longer necessary with setInsecure()
+#include <WiFiManager.h>
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -21,8 +22,9 @@ int stripLength=0;
 // Replace the next variables with your SSID/Password combination
 //const char* ssid = "StartideRising"; //CenturyLink3314
 //const char* password = "3arthClan2book"; //buet2kpjnnbtw9
-const char* ssid = "Gonzaga Guest";
-const char* password = "";
+//const char* ssid = "Blaine";
+//const char* password = "cowsrock";
+
 String deviceMacAddress;
 
 int dynamMode=0; //MQTT message can set this variable. loop() checks it each animation step to know what mode to be in
@@ -75,13 +77,14 @@ bool BRG;
 bool acceptingInput=true;
 
 bool justBooted=true;
+bool inCaptivePortal=false;
 
 // LED Pin
 const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.139"
+  "0.141"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -92,9 +95,10 @@ void stripUpdate();
 
 void setup() {
   Serial.begin(115200);
-  
+  Serial.println("----------");
   pinMode(15,INPUT_PULLUP);
   pinMode(4,INPUT_PULLUP);
+  delay(10); //give voltage levels time to stabalize before reading config pins
   if(digitalRead(4)==0){ //BRG if D4 is grounded (or D2 AND D15)
     BRG=true;
     RGB=false;
@@ -165,6 +169,7 @@ void setup() {
     Serial.println(" based on EEPROM value");
   }
   Serial.println("Run EEPROM value update file on GITHUB to change strip length on this ESP");
+  Serial.println("NEW: strip length update setting also availible to user in wifi setup page. Boot ESP while out of range of saved network to access");
 
   EEPROM.end();
   //strip = Adafruit_NeoPixel(150, PIN, NEO_GRB + NEO_KHZ800);
@@ -196,7 +201,7 @@ void setup() {
 */
   //all white on boot
   for(int i=0;i<stripLength;i++){
-    strip.setPixelColor(i, strip.Color(255,0,0));
+    strip.setPixelColor(i, strip.Color(255,255,255));
     if(stripLength==18){
       delay(25);
     }else{
@@ -215,8 +220,6 @@ void setup() {
   Serial.print("Active firmware version:");
   Serial.println(FirmwareVer);
   Serial.println("Will now check for new firmware..");
-
-  
   if (FirmwareVersionCheck()) {
       firmwareUpdate();
     }
@@ -235,23 +238,108 @@ void stripUpdate(int pixel,int r,int g,int b){
 }
 
 void setup_wifi() {
+  WiFiManager manager;
+  manager.setDebugOutput(false);
+  //manager.resetSettings();
+  
+  WiFiManagerParameter stripLengthParameter("parameterId", "Strip Length", String(stripLength).c_str(), 5);
+  manager.addParameter(&stripLengthParameter);
+  //would be a useful way to determine strip order, but I already have code to set this by connecting certain pins on the ESP, so maybe we'll switch to this in the future, but for now pin woring works.
+  //WiFiManagerParameter parameterTwo("parameterId2", "Strip Color Order", "RGB", 3);
+  //manager.addParameter(&parameterTwo);
+
+  Serial.println("Attempting to connect to saved network");
+  WiFi.begin();
+  unsigned long startTime=millis();
+  while(WiFi.status()!=WL_CONNECTED && millis()-startTime<14000){
+    Serial.print(".");
+    delay(500);
+    if(WiFi.status()==WL_NO_SSID_AVAIL || WiFi.status()==WL_CONNECT_FAILED){
+      break;
+    }
+  }
+  Serial.println();
+
+  if(WiFi.status()!=WL_CONNECTED){ //WIFI MANAGER BLOCK
+    String networkName="HemmTree ESP-"+WiFi.macAddress();
+    Serial.print("Connection to saved network failed, starting config AP on: ");
+    Serial.println(networkName);
+
+    //set lights to indicate that we are in config mode
+    //set lights to indicate that we are in config mode
+    for(int i=0;i<stripLength;i++){
+      if(i%5==0){
+        strip.setPixelColor(i, strip.Color(0,0,50));
+      }else{
+        strip.setPixelColor(i, strip.Color(0,0,0));
+      }
+      strip.show();
+      delay(10);
+    }
+
+    manager.setTimeout(60*5); //if no pages are loaded on the setup AP within this many seconds, reboot in an attempt to connect to the saved network again.
+    if(!manager.autoConnect(networkName.c_str(),"")){
+      Serial.println("WifiManager portal timeout. Resetting now to attempt connection again. Will launch AP again on reboot if connection fails again");
+      Serial.println("\n\n");
+      ESP.restart();
+    }
+    Serial.print("Successfully connected to ");
+    Serial.println(WiFi.SSID());
+
+    int stripLengthInputAsInt= atoi(stripLengthParameter.getValue());
+    if(stripLengthInputAsInt==0){
+      Serial.print("INVALID STRIP LENGTH (user did not enter number)\nUSING DEFAULT (or previous) LENGTH: ");
+      Serial.println(stripLength);
+    }else if(stripLengthInputAsInt!=stripLength){ //only bother updating if they actually changed the length
+      Serial.print("Strip Length: ");
+      Serial.println(stripLength);
+      stripLength=stripLengthInputAsInt;
+      Serial.println("------------------DEBUG ONE");
+      strip.clear(); //clear entire strip before potentially shortening length, so excess lights are off
+      strip.show();
+      strip.updateLength(stripLength);
+      
+      //WRITE NEW STRIPLENGTH TO EEPROM
+      int boardId = 18;
+      int address=0;
+      int readId;
+      EEPROM.begin(12);
+      EEPROM.write(address, boardId);//EEPROM.put(address, boardId);
+      address += sizeof(boardId); //update address value  (this confuses me. Wear leveling? I don't thinks so...)
+    
+      float param = stripLength; 
+      EEPROM.writeFloat(address, param);//EEPROM.put(address, param);
+      EEPROM.commit();
+      EEPROM.end();
+    }
+    //light up white now that we're connected and ready to go! (if we implement persistant MQTT messages, this may be immediately overridden by the last mode. Maybe a case for turning it black backwards instead of white forwards)
+    for(int i=0;i<strip.numPixels();i++){
+      strip.setPixelColor(i, strip.Color(255,255,255));
+      strip.show();
+      delay(15);
+    }
+  }
+
+  Serial.print("Succesfully connected to ");
+  Serial.println(WiFi.SSID());
+
+  //OLD CODE, PRIOR TO WIFI MANAGER (just using hard-coded credentials)
+  /*
   delay(10);
   // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
-
   WiFi.begin(ssid, password);
-
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-
   Serial.println("");
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  */
 }
 
 void callback(char* topic, byte* message, unsigned int length) {
@@ -866,6 +954,13 @@ void loop() {
     }else if(!justBooted && client.connected()){
       client.publish("GUHemmTree/connectionLog",("RECONNECT,"+deviceMacAddress).c_str()); //do this any time we were reconnecting and re-established connection
     }
+  }else if(inCaptivePortal){ //if we were in a captive portal (showing orange), but got here that means we aren't anymore so we should update the strip to stop being orange
+    inCaptivePortal=false;
+    for(int i=0;i<strip.numPixels();i++){
+      strip.setPixelColor(i, strip.Color(255,255,255));
+      strip.show();
+      delay(15);
+    }
   }
   client.loop(); //checks for new MQTT msg
 
@@ -1232,6 +1327,22 @@ int FirmwareVersionCheck(void) {
       } else {
         Serial.print("error in downloading version file:");
         Serial.println(httpCode);
+        if(httpCode==-1){
+          inCaptivePortal=true;
+          Serial.println("HELP: This probably means the ESP is stuck in a captive portal. Make sure it is registered on the network.");
+          Serial.print("Your MAC address for registration is ");
+          Serial.println(WiFi.macAddress());
+          //light strip orange to indicate captive portal
+          for(int i=0;i<100;i++){
+            if(i%5==0){
+              strip.setPixelColor(i, strip.Color(255/2,100/2,0));
+            }else{
+              strip.setPixelColor(i, strip.Color(0,0,0));
+            }
+            strip.show();
+            delay(10);
+          }
+        }
       }
       https.end();
     }
