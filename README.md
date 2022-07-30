@@ -4,14 +4,27 @@ Code to run Gonzaga Hemmingson Christmas Tree ornaments and other LED strips syn
 ESP32 WROOM is used in this project. 
 It is important that all ESPs are identical, otherwise at bootup they will firmware update with the compiled binary which may be incompatible with the board.
 
-<b>INITIAL SETUP (done individually for each ESP</b>
-  1) Setting the number of LEDs this ESP will run (optional)<br>
+### INITIAL SETUP (done individually for each ESP)
+This assumes you already have the Arduino IDE installed with ESP32 boards. If not, please follow instructions <a href="https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/">here</a> first. You may also need <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">this</a> driver.
+<ol>
+  <li><b>Flashing the initial ESP code</b><br>
+    The full HemmTree2021.ino code has many library dependancies, so it is easiest to flash firmwareUpdate.ino, which has no external dependancies. This code will immediately.... (hold on, better not hard code credentials. or at least not save them
+    <br>[when uploading code, use the board "Node32s"]
+  </li>
+  <li><b>Another Step</b><br>
+  the instructions
+  </li>
+</ol>
+
+
+
+  1) <b>Setting the number of LEDs this ESP will run (optional)</b><br>
         If you skip this step, the ESP will use the default strip length as specified in the code. If you would like to use a different strip length, download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP. The strip length is now set in ROM.
-  2) Flashing the initial ESP code
+  2) <b>Flashing the initial ESP code</b><br>
         Download HemmTree2021.ino, place it in the same directory as cert.h and upload it to the ESP32 over USB. It will now check for firmware updates from this repository each boot.
   
 
-<b>FIRMWARE UPDATES</b>
+### FIRMWARE UPDATES
   1) Modifying the code
         If you would like to deploy updates to all ESPs, make your modifications to the HemmTree2021.ino code, then increment FirmwareVer in code.
   2) Compiling the code
