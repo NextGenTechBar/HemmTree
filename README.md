@@ -4,6 +4,9 @@ Code to run Gonzaga Hemmingson Christmas Tree ornaments and other LED strips syn
 ESP32 WROOM is used in this project. 
 It is important that all ESPs are identical, otherwise at bootup they will firmware update with the compiled binary which may be incompatible with the board.
 
+TABLE OF CONTENTS
+
+
 ### INITIAL SETUP (done individually for each ESP)
 This assumes you already have the Arduino IDE installed with ESP32 boards. If not, please follow instructions <a href="https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/">here</a> first. You may also need <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">this</a> driver.
 <ol>
@@ -22,10 +25,15 @@ This assumes you already have the Arduino IDE installed with ESP32 boards. If no
   </li>
 </ol>
 
+<b>Wrong colors?</b> Some Neopixel LED strips use different color orders. By default, HemmTree sends commands in the Red,Green,Blue (RGB) format. However, if your strip expects commands in, for example, the GRB format, "red" will show as green and "green" will show as red. To correct this, there are special pins you can ground on the microcontroller to instruct it to change how colors are shown.
+* <b>RGB: </b>Do not make any additional connections
+* <b>BRG: </b>Solder pin D4 permenantly to GND
+* <b>GRB: </b>Solder pin D15 permenatly to GND
+
 <p></p>
 
 ### FIRMWARE UPDATES
-<br>If you want to add new special modes, or make any other changes, GitHub OTA updates let you wirelessly update the code on all ESPs simultaniously.
+If you want to add new special modes, or make any other changes, GitHub OTA updates let you wirelessly update the code on all ESPs simultaniously.
 
   1) <b>Modifying the code</b><br>
         If you would like to deploy updates to all ESPs, make your modifications to the HemmTree2021.ino code, then increment FirmwareVer in code. (BE CAREFUL! If you accidentally make a change that breaks the wifi connection code or firmware update code, you could cause all ESPs to become inaccessible and need re-flashed over USB. It is highly recommended to test the new code by uploading it over USB to a test ornament (with old FirmwareVer variable) before deploying it OTA to all ornaments.)
@@ -38,14 +46,26 @@ This assumes you already have the Arduino IDE installed with ESP32 boards. If no
         
 
 ### CHANGING STRIP LENGTH
-
 The strip length (number of series LEDs on each individual ornament) can be updated individually on each ESP32 thorugh the configuration portal. However, the configuration portal is only launched when the ESP32 fails to connect to wifi. Therefore, the portal can be launched by booting the ESP32 outside of range of the saved wifi network. If this is not feasible, you can update the strip length as follows:
 <br>Download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP32 (if you are having difficulties with this step, see the note at the begining of "initial setup" instructions). The new strip length is now set in EEPROM. After this, you can follow the above instructions for "INITIAL SETUP" to put the HemmTree code back on the ESP32.
 
-### USAGE<br>
+### USAGE
+Once connected to a wifi network, each ESP32 receives commands over MQTT from the MQTT server `broker.mqtt-dashboard.com` on the topic GUHemmTree. These commands are have a special syntax as outlined below in the "MQTT Command Formatting" section. The website https://ngtb95.wixsite.com/ngtb is set up to send commands in a user-friendly way using the npm MQTT package in Wix.
 
-https://ngtb95.wixsite.com/ngtb
+### STATUS INDICATIONS
+The ESP32 can indicate various things by lighting up the strip in a specific way. If only every 5th LED is on, this is a status indication.
 
+* <b>White:</b> The ESP32 is currently downloading an update from GitHub. DO NOT unplug it. This should only last for around 30 seconds, after which it will reboot with the new firmware. If the strip has been stuck like this for more than 3 minutes, you can try unplugging it and plugging it back in. Possibilities are:
+  * There was a glitch and the reboot will fix it
+  * It is stuck in an update loop (if so, the strip will alternate from solid white to spotted white). The version number in `ESP32_code.bin` and `code_version.txt` probably do not match
+  * Your firmware update has broken something
+
+* <b>Blue:</b> The ESP32 could not connect to the saved network and is now in Configuration Mode. It will retry automatically in 5 minutes, and you can unplug and plug it back in to retry immediately. Otherwise, follow the initial setup instructions above, starting at step 2.
+* <b>Orange: </b> The ESP32 could connect to the saved wifi network, but cannot access GitHub. Likely it is stuck in a captive portal and needs registered to your network. If you need the MAC address, you can plug in to the ESP32 USB port, and the MAC address will be printed over Serial Monitor.
+  <br>Note: if it only flashes orange breifly on boot, that means it can connect to the MQTT server, but not GitHub. This means it will have full functionality, but OTA updates probably won't work.
+
+### MQTT COMMAND FORMATTING
+If you want to add a way to control the lights
 At the time of writing, the webserver/python code does not exist yet. But in general, all ESP32s will receive commands via MQTT. At the time of writing, the broker is broker.mqtt-dashboard.comt and the topic is GUHemmTree (you can check the code to verify this). Please check the code for the latest possible commands, but in general, the format is:<br>
   |TYPE OF COMMAND|RED VALUE FOR PIXEL 1|GREEN VALUE FOR PIXEL 1|BLUE VALUE FOR PIXEL 1|RED VALUE FOR PIXEL 2|......<br>
   for example, COLOR000255000000000255 tells the ESP to turn the first light green, then the second light blue, then repeat that pattern for the whole strip (note, adding 9 more digits makes it a three digit pattern)<br>
