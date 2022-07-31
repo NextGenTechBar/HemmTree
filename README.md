@@ -4,10 +4,16 @@ Code to run Gonzaga Hemmingson Christmas Tree ornaments and other LED strips syn
 ESP32 WROOM is used in this project. 
 It is important that all ESPs are identical, otherwise at bootup they will firmware update with the compiled binary which may be incompatible with the board.
 
-TABLE OF CONTENTS
-[Go to Real Cool Heading section](#initial-setup-done-individually-for-each-esp)
+## TABLE OF CONTENTS
+[Initial Setup](#initial-setup-done-individually-for-each-esp)
+<br>[Firmware Updates](#firmware-updates)
+<br>[Changing Strip Length](#changing-strip-length)
+<br>[Usage](#usage)
+<br>[Status Indications](#status-indications)
+<br>[Python Programs](#python-programs) (record stats, turn tree on/off, etc)
+<br>[MQTT Command Formatting](#mqtt-command-formatting)
 
-
+##
 
 ### INITIAL SETUP (done individually for each ESP)
 This assumes you already have the Arduino IDE installed with ESP32 boards. If not, please follow instructions <a href="https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/">here</a> first. You may also need <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">this</a> driver.
@@ -32,7 +38,7 @@ This assumes you already have the Arduino IDE installed with ESP32 boards. If no
 * <b>BRG: </b>Solder pin D4 permenantly to GND
 * <b>GRB: </b>Solder pin D15 permenatly to GND
 
-<p></p>
+<br><br>
 
 ### FIRMWARE UPDATES
 If you want to add new special modes, or make any other changes, GitHub OTA updates let you wirelessly update the code on all ESPs simultaniously.
@@ -45,14 +51,19 @@ If you want to add new special modes, or make any other changes, GitHub OTA upda
         Update the number in the file code_version.txt in this repository to reflect the number you just incremented FirmwareVer to in the code.
   4) <b>Commanding the firmware update</b><br>
         At the next reboot, each ESP32 will compare the current FirmwareVer number to the one on GitHub, then download and flash the new .bin file if the GitHub number is greater than the local one. During a firmware update, the LED strip will display spotted white. DO NOT unplug it during this time. If you would like to issue a firmware update immediately, you can send the command 'FIRMWARE_UPDATE' to the topic ('GUHemmTree' at the time of writing), over MQTT and this will instruct all online ESP32s to check for a new firmware version. Note: you can manually issue MQTT instructions via http://www.hivemq.com/demos/websocket-client/
-        
+   
+<br><br>
 
 ### CHANGING STRIP LENGTH
 The strip length (number of series LEDs on each individual ornament) can be updated individually on each ESP32 thorugh the configuration portal. However, the configuration portal is only launched when the ESP32 fails to connect to wifi. Therefore, the portal can be launched by booting the ESP32 outside of range of the saved wifi network. If this is not feasible, you can update the strip length as follows:
 <br>Download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP32 (if you are having difficulties with this step, see the note at the begining of "initial setup" instructions). The new strip length is now set in EEPROM. After this, you can follow the above instructions for "INITIAL SETUP" to put the HemmTree code back on the ESP32.
 
+<br><br>
+
 ### USAGE
 Once connected to a wifi network, each ESP32 receives commands over MQTT from the MQTT server `broker.mqtt-dashboard.com` on the topic GUHemmTree. These commands are have a special syntax as outlined below in the "MQTT Command Formatting" section. The website https://ngtb95.wixsite.com/ngtb is set up to send commands in a user-friendly way using the npm MQTT package in Wix.
+
+<br><br>
 
 ### STATUS INDICATIONS
 The ESP32 can indicate various things by lighting up the strip in a specific way. If only every 5th LED is on, this is a status indication.
@@ -66,12 +77,16 @@ The ESP32 can indicate various things by lighting up the strip in a specific way
 * <b>Orange: </b> The ESP32 could connect to the saved wifi network, but cannot access GitHub. Likely it is stuck in a captive portal and needs registered to your network. If you need the MAC address, you can plug in to the ESP32 USB port, and the MAC address will be printed over Serial Monitor.
   <br>Note: if it only flashes orange breifly on boot, that means it can connect to the MQTT server, but not GitHub. This means it will have full functionality, but OTA updates probably won't work.
 
+<br><br>
+
 ### PYTHON PROGRAMS
 These programs add functionality to the tree. At the time of writing, they are somewhat crude. An easy way to go is have all or some of them running in terminal on a raspberry pi in the NGTB, either headless or hooked up to the big TV. Functionality of each program is outlined below:
 
 * <b>HemmTreeStatsRecorder.py</b> - Monitors the MQTT channel `GUHemmTreeStats` which https://ngtb95.wixsite.com/ngtb sends a message to in human-friendly format along with each button press. Each button press is logged to a file along with the date/time. At the end of Christmas (or even in realtime!) you can do stats on number of button presses, most popular colors, etc.
 * <b>HemmTreeSleepWake.py</b> - This program will turn all ESP32s off at a certain time, and back on at a certain time. If your ornaments are plugged in to the same place as the regular lights, they'll be powered off by the same relay, otherwise you may want to use this program so the ornaments aren't on all night. Useful for the NGTB strips regardless. (note: the special commands `SLEEP` and `AWAKE` disable and re-enable ornaments receiving commands, respectively).
 * <b>HemmTreeHourPulser.py</b> - Pulses the time at the top of each hour (ex: at 9:00, it will flash the ornaments 9 times).
+
+<br><br>
 
 ### MQTT COMMAND FORMATTING
 If you want to add a way to control the lights, you'll need to know how to format the commands. Adding a control source is as easy as programming something (python program, microcontroller, website, etc) to publish MQTT messages to the topic `GUHemmTree` on the server `broker.mqtt-dashboard.com`. There is no limit to how many simultanious sources can send commands. Invalid commands are ignored by the ornaments. You should send the commands with the retain flag set to true, so that newly subscribed clients will know what the other ornaments are displaying and sync up immediately. 
