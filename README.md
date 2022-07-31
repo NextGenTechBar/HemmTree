@@ -5,10 +5,10 @@ ESP32 WROOM is used in this project.
 It is important that all ESPs are identical, otherwise at bootup they will firmware update with the compiled binary which may be incompatible with the board.
 
 TABLE OF CONTENTS
-<a href="initialsetup">initial setup</a>
+[Go to Real Cool Heading section](#initial-setup-done-individually-for-each-esp)
 
 
-<a name="initalsetup"></a>
+
 ### INITIAL SETUP (done individually for each ESP)
 This assumes you already have the Arduino IDE installed with ESP32 boards. If not, please follow instructions <a href="https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/">here</a> first. You may also need <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">this</a> driver.
 <ol>
