@@ -64,12 +64,30 @@ The ESP32 can indicate various things by lighting up the strip in a specific way
 * <b>Orange: </b> The ESP32 could connect to the saved wifi network, but cannot access GitHub. Likely it is stuck in a captive portal and needs registered to your network. If you need the MAC address, you can plug in to the ESP32 USB port, and the MAC address will be printed over Serial Monitor.
   <br>Note: if it only flashes orange breifly on boot, that means it can connect to the MQTT server, but not GitHub. This means it will have full functionality, but OTA updates probably won't work.
 
+### Python programs
+
 ### MQTT COMMAND FORMATTING
-If you want to add a way to control the lights
-At the time of writing, the webserver/python code does not exist yet. But in general, all ESP32s will receive commands via MQTT. At the time of writing, the broker is broker.mqtt-dashboard.comt and the topic is GUHemmTree (you can check the code to verify this). Please check the code for the latest possible commands, but in general, the format is:<br>
-  |TYPE OF COMMAND|RED VALUE FOR PIXEL 1|GREEN VALUE FOR PIXEL 1|BLUE VALUE FOR PIXEL 1|RED VALUE FOR PIXEL 2|......<br>
-  for example, COLOR000255000000000255 tells the ESP to turn the first light green, then the second light blue, then repeat that pattern for the whole strip (note, adding 9 more digits makes it a three digit pattern)<br>
-  FRACS000255000000000255 tells it to divide the strip in to equal parts green and blue<br>
-  DYNAMRAINBOW tells it to execute the "Rainbow" animation.
-  
-  MQTT messages can be generated from any, or multiple sources. So for example, you can have a webserver accepting user input and sending the results over MQTT int he proper format. You can have a python program listening for a twitter hashtag, decoding the twitter message and sending the result over MQTT. You can even have a seperate python program running to send messages such as pulsing the lights at the top of each hour, changing the color when someone stands in a specific place, etc. You can come up with as many input sources as you want!
+If you want to add a way to control the lights, you'll need to know how to format the commands. Adding a control source is as easy as programming something (python program, microcontroller, website, etc) to publish MQTT messages to the topic `GUHemmTree` on the server `broker.mqtt-dashboard.com`. There is no limit to how many simultanious sources can send commands. Invalid commands are ignored by the ornaments. You should send the commands with the retain flag set to true, so that newly subscribed clients will know what the other ornaments are displaying and sync up immediately. 
+
+In general, the format is `|TYPE OF COMMAND|RED VALUE 1|GREEN VALUE 1|BLUE VALUE 1|RED VALUE 2|......` and there are no limits to the length of your patterns
+
+* <b>Types of commands</b>
+  * <b>Solid Color / Repetition Pattern: </b>COLOR
+    * ex: COLOR000255000 - Make the whole strip green
+    * ex: COLOR000255000255000000 - Make the first pixel green, the second pixel red, the 3rd pixel green, 4th red, etc...
+    * ex: COLOR000255000255000000255255000 - green, red, yellow, green, red, yellow.......
+  * <b>Split strip in to equal sections: </b>FRACS
+    * ex: FRACS255000000000000255 - Split the strip in to equal parts red and blue
+    * ex: FRACS255000000000000255255255000 - One third of the strip red, one third blue, one third yellow
+  * <b>Modes with animation: </b>DYNAM
+    * These trigger modes pre-programmed in the firmware. If you would like to add a new one, you will have to issue a firmware update (see above).
+    * ex: DYNAMrainbow - starts the moving rainbow mode (see code for complete list of commands, starting at `=="DYNAM"`)
+  * <b>Modes that have ESP-generated patterns/animations, but end static: </b>OTHER
+    * These trigger modes pre-programmed in the firmware. If you would like to add a new one, you will have to issue a firmware update (see above).
+    * ex: OTHERdifferentcolors - Each ESP32 picks a random color to display, and stays that color until the next command is given (see code for complete list of commands, starting at `=="OTHER"`)
+  * <b>Modes that show a breif animation, then return to the previous mode: </b>SHORT
+    * These trigger modes pre-programmed in the firmware. If you would like to add a new one, you will have to issue a firmware update (see above).
+    * ex: SHORTthayne - makes each ornament flash Gonzaga colors, then return to the previous mode
+    * (see code for complete list of commands, starting at `=="SHORT"`)
+  * <b>Pulse the strip x times: </b>PULSE
+    * ex: PULSE5 - pulses the ornaments 5 times in whatever mode they are currently in, then returns to that mode (useful for pulsing the top of each hour from a python program)
