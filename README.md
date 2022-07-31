@@ -18,6 +18,9 @@ It is important that all ESPs are identical, otherwise at bootup they will firmw
 ### INITIAL SETUP (done individually for each ESP)
 This assumes you already have the Arduino IDE installed with ESP32 boards. If not, please follow instructions <a href="https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/">here</a> first. You may also need <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">this</a> driver.
 <ol>
+  <li><b>Hardware Setup</b><br>
+    The hardware consists of a Neopixel LED strip connected to pin D33 of the ESP32. The ESP32 can be powered by 5V on the Vin pin. If your neopixel strip is 12V, you can use a linear voltage regulator. The L7805 works well because supplying 5V to the output side (which happens if you plug the ESP in to your computer over USB) does not damage it. I have found it convenient to supply power via an XT30 connector on the LED strip, and the LED strip connects to the ESP via a JST SM connector, supplying power and carrying signal. See ConnectionDiagram.png for an illustration (If 5V strip, change AC Adapter to 5V and remove the voltage regulator).
+  </li>
   <li><b>Flashing the initial ESP code</b><br>
     The full HemmTree2021.ino code has many library dependancies, so it is easiest to flash firmwareUpdate.ino, which has no external dependancies. This code will connect to wifi and immediately download+install the full code from this repository and reboot. To use it, just change the SSID and password at the top of the sketch to your wifi details. Then upload it to your ESP32. The onboard blue light will flash rapidly to indicate it is downloading the full code.
     <br>[when uploading code, use the board "Node32s"]
