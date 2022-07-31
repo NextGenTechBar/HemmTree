@@ -55,7 +55,7 @@ If you want to add new special modes, or make any other changes, GitHub OTA upda
 <br><br>
 
 ### CHANGING STRIP LENGTH
-The strip length (number of series LEDs on each individual ornament) can be updated individually on each ESP32 thorugh the configuration portal. However, the configuration portal is only launched when the ESP32 fails to connect to wifi. Therefore, the portal can be launched by booting the ESP32 outside of range of the saved wifi network. If this is not feasible, you can update the strip length as follows:
+The strip length (number of series LEDs on each individual ornament) can be updated individually on each ESP32 thorugh the configuration portal (note: the wifi connection must be successful for the strip length to save). However, the configuration portal is only launched when the ESP32 fails to connect to wifi. Therefore, the portal can be launched by booting the ESP32 outside of range of the saved wifi network. If this is not feasible, you can update the strip length as follows:
 <br>Download WriteStringLengthToEEPROM.ino and change the line 'float param = 300;', replacing 300 with the desired strip length. Upload the code to the ESP32 (if you are having difficulties with this step, see the note at the begining of "initial setup" instructions). The new strip length is now set in EEPROM. After this, you can follow the above instructions for "INITIAL SETUP" to put the HemmTree code back on the ESP32.
 
 <br><br>
