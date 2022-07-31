@@ -5,8 +5,10 @@ ESP32 WROOM is used in this project.
 It is important that all ESPs are identical, otherwise at bootup they will firmware update with the compiled binary which may be incompatible with the board.
 
 TABLE OF CONTENTS
+<a href="initialsetup">initial setup</a>
 
 
+<a name="initalsetup"></a>
 ### INITIAL SETUP (done individually for each ESP)
 This assumes you already have the Arduino IDE installed with ESP32 boards. If not, please follow instructions <a href="https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/">here</a> first. You may also need <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">this</a> driver.
 <ol>
@@ -64,7 +66,12 @@ The ESP32 can indicate various things by lighting up the strip in a specific way
 * <b>Orange: </b> The ESP32 could connect to the saved wifi network, but cannot access GitHub. Likely it is stuck in a captive portal and needs registered to your network. If you need the MAC address, you can plug in to the ESP32 USB port, and the MAC address will be printed over Serial Monitor.
   <br>Note: if it only flashes orange breifly on boot, that means it can connect to the MQTT server, but not GitHub. This means it will have full functionality, but OTA updates probably won't work.
 
-### Python programs
+### PYTHON PROGRAMS
+These programs add functionality to the tree. At the time of writing, they are somewhat crude. An easy way to go is have all or some of them running in terminal on a raspberry pi in the NGTB, either headless or hooked up to the big TV. Functionality of each program is outlined below:
+
+* <b>HemmTreeStatsRecorder.py</b> - Monitors the MQTT channel `GUHemmTreeStats` which https://ngtb95.wixsite.com/ngtb sends a message to in human-friendly format along with each button press. Each button press is logged to a file along with the date/time. At the end of Christmas (or even in realtime!) you can do stats on number of button presses, most popular colors, etc.
+* <b>HemmTreeSleepWake.py</b> - This program will turn all ESP32s off at a certain time, and back on at a certain time. If your ornaments are plugged in to the same place as the regular lights, they'll be powered off by the same relay, otherwise you may want to use this program so the ornaments aren't on all night. Useful for the NGTB strips regardless. (note: the special commands `SLEEP` and `AWAKE` disable and re-enable ornaments receiving commands, respectively).
+* <b>HemmTreeHourPulser.py</b> - Pulses the time at the top of each hour (ex: at 9:00, it will flash the ornaments 9 times).
 
 ### MQTT COMMAND FORMATTING
 If you want to add a way to control the lights, you'll need to know how to format the commands. Adding a control source is as easy as programming something (python program, microcontroller, website, etc) to publish MQTT messages to the topic `GUHemmTree` on the server `broker.mqtt-dashboard.com`. There is no limit to how many simultanious sources can send commands. Invalid commands are ignored by the ornaments. You should send the commands with the retain flag set to true, so that newly subscribed clients will know what the other ornaments are displaying and sync up immediately. 
