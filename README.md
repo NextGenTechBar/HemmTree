@@ -65,6 +65,7 @@ The strip length (number of series LEDs on each individual ornament) can be upda
 
 ### USAGE
 Once connected to a wifi network, each ESP32 receives commands over MQTT from the MQTT server `broker.mqtt-dashboard.com` on the topic GUHemmTree. These commands are have a special syntax as outlined below in the "MQTT Command Formatting" section. The website https://ngtb95.wixsite.com/ngtb is set up to send commands in a user-friendly way using the npm MQTT package in Wix.
+<br>If all ornaments/strips are functioning properly, all you need to do is plug them in, and you will then be able to control them from the above website. Check the LED strip to know if you should use a 12 volt or 5 volt power supply. If the ornament is not functioning as expected, refer first to "Status Indications" below, and if that doesn't resolve it, then to "Initial Setup" above.
 
 <br><br>
 
