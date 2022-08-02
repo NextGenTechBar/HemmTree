@@ -53,7 +53,7 @@ If you want to add new special modes, or make any other changes, GitHub OTA upda
   3) <b>Updating version number</b><br>
         Update the number in the file code_version.txt in this repository to reflect the number you just incremented FirmwareVer to in the code.
   4) <b>Commanding the firmware update</b><br>
-        At the next reboot, each ESP32 will compare the current FirmwareVer number to the one on GitHub, then download and flash the new .bin file if the GitHub number is greater than the local one. During a firmware update, the LED strip will display spotted white. DO NOT unplug it during this time. If you would like to issue a firmware update immediately, you can send the command 'FIRMWARE_UPDATE' to the topic ('GUHemmTree' at the time of writing), over MQTT and this will instruct all online ESP32s to check for a new firmware version. Note: you can manually issue MQTT instructions via http://www.hivemq.com/demos/websocket-client/
+        At the next reboot, each ESP32 will compare the current FirmwareVer number to the one on GitHub, then download and flash the new .bin file if the GitHub number is different than the local one. During a firmware update, the LED strip will display spotted white. DO NOT unplug it during this time. If you would like to issue a firmware update immediately, you can send the command 'FIRMWARE_UPDATE' to the topic ('GUHemmTree' at the time of writing), over MQTT and this will instruct all online ESP32s to check for a new firmware version. Note: you can manually issue MQTT instructions via http://www.hivemq.com/demos/websocket-client/
    
 <br><br>
 
@@ -76,7 +76,7 @@ The ESP32 can indicate various things by lighting up the strip in a specific way
   * It is stuck in an update loop (if so, the strip will alternate from solid white to spotted white). The version number in `ESP32_code.bin` and `code_version.txt` probably do not match
   * Your firmware update has broken something
 
-* <b>Blue:</b> The ESP32 could not connect to the saved network and is now in Configuration Mode. It will retry automatically in 5 minutes, and you can unplug and plug it back in to retry immediately. Otherwise, follow the initial setup instructions above, starting at step 2.
+* <b>Blue:</b> The ESP32 could not connect to the saved network and is now in Configuration Mode. It will retry automatically in 5 minutes, and you can unplug and plug it back in to retry immediately. Otherwise, follow the initial setup instructions above, starting at step 3.
 * <b>Orange: </b> The ESP32 could connect to the saved wifi network, but cannot access GitHub. Likely it is stuck in a captive portal and needs registered to your network. If you need the MAC address, you can plug in to the ESP32 USB port, and the MAC address will be printed over Serial Monitor.
   <br>Note: if it only flashes orange breifly on boot, that means it can connect to the MQTT server, but not GitHub. This means it will have full functionality, but OTA updates probably won't work.
 
