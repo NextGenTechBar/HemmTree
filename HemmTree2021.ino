@@ -1,7 +1,24 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-//this block for GITHUBf update
+/*
+NGTB MACs (ornaments and lighting strips, and one extra?)
+94:B9:7E:FA:13:64
+58:BF:25:16:B4:B0
+4C:EB:D6:76:4B:64 //stuck in captive portal?
+94:B9:7E:F9:0F:74
+58:BF:25:83:8D:54
+4C:EB:D6:75:C7:54
+58:BF:25:83:B5:D4
+58:BF:25:16:AE:DC
+C8:C9:A3:F9:02:78
+58:BF:25:81:7B:18
+58:BF:25:17:33:DC
+58:BF:25:81:65:2C
+08:3A:F2:A9:E5:78
+*/
+
+//this block for GITHUB update
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <WiFiClientSecure.h>
@@ -84,7 +101,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.141"
+  "0.145"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
