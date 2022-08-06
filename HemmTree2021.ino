@@ -101,7 +101,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.145"
+  "0.146"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -947,7 +947,7 @@ void reconnect() {
     // Attempt to connect
     Serial.print("mac address1: ");
     Serial.println(deviceMacAddress);
-    if (client.connect(deviceMacAddress.c_str(),"","","GUHemmTree/connectionLog",1,true,("DISCONNECT,"+deviceMacAddress).c_str())) { //make client ID the mac address to ensure it's unique
+    if (client.connect(deviceMacAddress.c_str(),"","","GUHemmTree/connectionLog",1,false,("DISCONNECT,"+deviceMacAddress).c_str())) { //make client ID the mac address to ensure it's unique
       Serial.println("connected");
       Serial.print("mac address2: ");
       Serial.println(deviceMacAddress);
@@ -966,7 +966,7 @@ void loop() {
   if (!client.connected()) {
     reconnect();
     if(justBooted && client.connected()){
-      client.publish("GUHemmTree/connectionLog",("BOOT,"+deviceMacAddress).c_str()); //only do this the first time
+      client.publish("GUHemmTree/connectionLog",("BOOT,"+deviceMacAddress+",v"+FirmwareVer).c_str()); //only do this the first time
       justBooted=false;
     }else if(!justBooted && client.connected()){
       client.publish("GUHemmTree/connectionLog",("RECONNECT,"+deviceMacAddress).c_str()); //do this any time we were reconnecting and re-established connection
@@ -1372,7 +1372,7 @@ int FirmwareVersionCheck(void) {
     if (payload.equals(FirmwareVer)) {
       Serial.printf("\nDevice already on latest firmware version:%s\n", FirmwareVer);
       return 0;
-    } 
+    }
     else 
     {
       Serial.println(payload);
