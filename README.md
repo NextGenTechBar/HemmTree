@@ -89,6 +89,7 @@ These programs add functionality to the tree. At the time of writing, they are s
 * <b>HemmTreeStatsRecorder.py</b> - Monitors the MQTT channel `GUHemmTreeStats` which https://ngtb95.wixsite.com/ngtb sends a message to in human-friendly format along with each button press. Each button press is logged to a file along with the date/time. At the end of Christmas (or even in realtime!) you can do stats on number of button presses, most popular colors, etc.
 * <b>HemmTreeSleepWake.py</b> - This program will turn all ESP32s off at a certain time, and back on at a certain time. If your ornaments are plugged in to the same place as the regular lights, they'll be powered off by the same relay, otherwise you may want to use this program so the ornaments aren't on all night. Useful for the NGTB strips regardless. (note: the special commands `SLEEP` and `AWAKE` disable and re-enable ornaments receiving commands, respectively).
 * <b>HemmTreeHourPulser.py</b> - Pulses the time at the top of each hour (ex: at 9:00, it will flash the ornaments 9 times).
+* <b>Boot Logger</b> - This program doesn't exist, but is easy to create. If you monitor MQTT topic `GUHemmTree/connectionLog`, you will get an event and associated MAC each time an ornament boots (along with the firmware version), disconnects, or reconnects after a disconnection.
 
 <br><br>
 
