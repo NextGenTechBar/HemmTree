@@ -41,6 +41,8 @@ This assumes you already have the Arduino IDE installed with ESP32 boards. If no
 * <b>BRG: </b>Solder pin D4 permenantly to GND
 * <b>GRB: </b>Solder pin D15 permenatly to GND
 
+<b>Too Bright?</b> By default, strips operate at maximum brightness. Optionally, you can connect a potentiometer to control how bright the strip is. To do this, solder pin D14 permenantly to ground to put the ESP32 in custom brightness mode. Then connect a potentiometer to pin D34 (power the ends of the potentiometer with GND and 3.3 volts). Note: brightness changes will only be reflected when the strip changes state.
+
 <br><br>
 
 ### FIRMWARE UPDATES
