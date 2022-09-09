@@ -94,13 +94,15 @@ bool acceptingInput=true;
 
 bool justBooted=true;
 bool inCaptivePortal=false;
+bool brightnessPotConnected=false;
+int lastBrightnessValue=255;
 
 // LED Pin
 const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.149"
+  "0.150"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -118,6 +120,7 @@ void setup() {
   Serial.println("----------");
   pinMode(15,INPUT_PULLUP);
   pinMode(4,INPUT_PULLUP);
+  pinMode(14,INPUT_PULLUP);
   delay(10); //give voltage levels time to stabalize before reading config pins
   if(digitalRead(4)==0){ //BRG if D4 is grounded (or D2 AND D15)
     BRG=true;
@@ -134,6 +137,12 @@ void setup() {
     RGB=true;
     GRB=false;
     Serial.println("RGB");
+  }
+
+  if(digitalRead(14)){ //if a wire is soldered from here to ground, that means a potentiometer is also connected to D35, and those readings should be used for brightness. Otherwise, set max.
+    brightnessPotConnected=false;
+  }else{
+    brightnessPotConnected=true;
   }
   
   
@@ -983,6 +992,14 @@ void loop() {
     }
   }
   client.loop(); //checks for new MQTT msg
+
+  if(brightnessPotConnected){
+    int newBrightness=map(analogRead(34), 0, 4095, 0, 255);
+    if(lastBrightnessValue>newBrightness+5 || lastBrightnessValue<newBrightness-5){
+      strip.setBrightness(newBrightness);
+      //strip.show(); //DON'T DO THIS: it causes colors with components that are not maximum to fade out. Leaving it out, brightness is only updated whenever strip.show() is called after setting the strip to another color, so color fidelity is preserved
+    }
+  }
 
   if(dynamMode!=0){
     setupMode=false;
