@@ -97,12 +97,14 @@ bool inCaptivePortal=false;
 bool brightnessPotConnected=false;
 int lastBrightnessValue=255;
 
+bool isMiniTree=false; //setup will read pin 35 and set this true if the pin is connected, indicating it is a mini-tree
+
 // LED Pin
 const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.150"
+  "0.151"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -143,6 +145,12 @@ void setup() {
     brightnessPotConnected=false;
   }else{
     brightnessPotConnected=true;
+  }
+
+  pinMode(35,INPUT_PULLUP);
+  delay(10); //give voltage levels time to stabalize before reading config pins
+  if(!digitalRead(35)){
+    isMiniTree=true; 
   }
   
   
