@@ -141,12 +141,6 @@ void setup() {
     Serial.println("RGB");
   }
 
-  if(digitalRead(14)){ //if a wire is soldered from here to ground, that means a potentiometer is also connected to D35, and those readings should be used for brightness. Otherwise, set max.
-    brightnessPotConnected=false;
-  }else{
-    brightnessPotConnected=true;
-  }
-
   pinMode(35,INPUT_PULLUP);
   delay(10); //give voltage levels time to stabalize before reading config pins
   if(!digitalRead(35)){
@@ -342,7 +336,7 @@ void setup_wifi() {
       int readId;
       EEPROM.begin(12);
       EEPROM.write(address, boardId);//EEPROM.put(address, boardId);
-      address += sizeof(boardId); //update address value  (this confuses me. Wear leveling? I don't thinks so...)
+      address += sizeof(boardId); //update address value  (I think this is just getting ready to put in another value but we don't have one so it doesn't matter)
     
       float param = stripLength; 
       EEPROM.writeFloat(address, param);//EEPROM.put(address, param);
@@ -1000,6 +994,13 @@ void loop() {
     }
   }
   client.loop(); //checks for new MQTT msg
+
+  //do this every loop because on mini-tree, users may change jumper while running
+  if(digitalRead(14)){ //if a wire is soldered from here to ground, that means a potentiometer is also connected to D35, and those readings should be used for brightness. Otherwise, set max.
+    brightnessPotConnected=false;
+  }else{
+    brightnessPotConnected=true;
+  }
 
   if(brightnessPotConnected){
     int newBrightness=map(analogRead(34), 0, 4095, 0, 255);
