@@ -104,7 +104,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.153"
+  "0.154"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1010,6 +1010,7 @@ void loop() {
     int newBrightness=map(analogRead(34), 0, 4095, 0, 255);
     if(lastBrightnessValue>newBrightness+5 || lastBrightnessValue<newBrightness-5){
       strip.setBrightness(newBrightness);
+      lastBrightnessValue=newBrightness; //lol, I forgot to do this for over a year, so all this fancy smoothing code wasn't actually doing anything LOL
       //strip.show(); //DON'T DO THIS: it causes colors with components that are not maximum to fade out. Leaving it out, brightness is only updated whenever strip.show() is called after setting the strip to another color, so color fidelity is preserved
     }
   }
