@@ -998,6 +998,10 @@ void loop() {
   //do this every loop because on mini-tree, users may change jumper while running
   if(digitalRead(14)){ //if a wire is soldered from here to ground, that means a potentiometer is also connected to D35, and those readings should be used for brightness. Otherwise, set max.
     brightnessPotConnected=false;
+    if(lastBrightnessValue<255){ //do this if someone removed the D14 jumper while running (meaning they want it to go to max brightness)
+      strip.setBrightness(255);
+      lastBrightnessValue=255;
+    }
   }else{
     brightnessPotConnected=true;
   }
