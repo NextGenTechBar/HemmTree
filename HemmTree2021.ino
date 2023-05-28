@@ -104,7 +104,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.154"
+  "0.155"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -232,7 +232,11 @@ void setup() {
 */
   //all white on boot
   for(int i=0;i<stripLength;i++){
-    strip.setPixelColor(i, strip.Color(255,255,255));
+    if(isMiniTree){ //set mini trees to less bright on boot, otherwise max brightness white will overwhelm potential 1A power supply, not giving them a chance to boot fully and enable lower-brightness mode (if set by pin)
+      strip.setPixelColor(i, strip.Color(90,90,90));
+    }else{
+      strip.setPixelColor(i, strip.Color(255,255,255));
+    }
     if(stripLength==18){
       delay(25);
     }else{
@@ -247,6 +251,24 @@ void setup() {
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
+/*
+  //TESTING MINI TREE
+  client.connect(deviceMacAddress.c_str());
+  Serial.println("BEGIN TESTTTTT");
+  client.publish("somethinglikethisok","test beginning");
+  for(int i=100;i<255;i++){
+    char temp[]="100";
+    itoa(i,temp,10);
+    client.publish("blaineDebugging",temp);
+    
+    Serial.println(i);
+    strip.setBrightness(i);
+    strip.show();
+    delay(500);
+  }
+  client.subscribe("GUHemmTree");  //RESULTS: 130 brightness breaks 1A charger, ext cable breaks early
+  //END TEST
+*/
 
   Serial.print("Active firmware version:");
   Serial.println(FirmwareVer);
@@ -1008,7 +1030,7 @@ void loop() {
 
   if(brightnessPotConnected){
     int newBrightness=map(analogRead(34), 0, 4095, 0, 255);
-    if(lastBrightnessValue>newBrightness+5 || lastBrightnessValue<newBrightness-5){
+    if(lastBrightnessValue>newBrightness+10 || lastBrightnessValue<newBrightness-10){
       strip.setBrightness(newBrightness);
       lastBrightnessValue=newBrightness; //lol, I forgot to do this for over a year, so all this fancy smoothing code wasn't actually doing anything LOL
       //strip.show(); //DON'T DO THIS: it causes colors with components that are not maximum to fade out. Leaving it out, brightness is only updated whenever strip.show() is called after setting the strip to another color, so color fidelity is preserved
