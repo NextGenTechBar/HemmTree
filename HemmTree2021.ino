@@ -104,7 +104,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.155"
+  "0.156"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -230,10 +230,27 @@ void setup() {
     strip.show();
   }
 */
+
+/*
+//TESTING
+for(int i=0;i<255;i++){
+  for(int k=0;k<stripLength;k++){
+    strip.setPixelColor(k, strip.Color(i,i,i));
+  }
+  if(i%10==0){
+    for(int k=0;k<stripLength;k++){
+      strip.setPixelColor(k, strip.Color(100,0,0));
+    }
+    delay(300);
+  }
+  strip.show();
+  delay(50);
+}
+*/
   //all white on boot
   for(int i=0;i<stripLength;i++){
     if(isMiniTree){ //set mini trees to less bright on boot, otherwise max brightness white will overwhelm potential 1A power supply, not giving them a chance to boot fully and enable lower-brightness mode (if set by pin)
-      strip.setPixelColor(i, strip.Color(90,90,90));
+      strip.setPixelColor(i, strip.Color(40,40,40));
     }else{
       strip.setPixelColor(i, strip.Color(255,255,255));
     }
