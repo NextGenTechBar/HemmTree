@@ -104,7 +104,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.156"
+  "0.157"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -384,7 +384,7 @@ void setup_wifi() {
     }
     //light up white now that we're connected and ready to go! (if we implement persistant MQTT messages, this may be immediately overridden by the last mode. Maybe a case for turning it black backwards instead of white forwards)
     for(int i=0;i<strip.numPixels();i++){
-      strip.setPixelColor(i, strip.Color(255,255,255));
+      strip.setPixelColor(i, strip.Color(50,50,50)); //this is usually not seen, but on cases where it is (usually turns blue, but then connects last minute), it shouldn't overload mini-trees
       strip.show();
       delay(15);
     }
@@ -1033,6 +1033,8 @@ void loop() {
     }
   }
   client.loop(); //checks for new MQTT msg
+
+
 
   //do this every loop because on mini-tree, users may change jumper while running
   if(digitalRead(14)){ //if a wire is soldered from here to ground, that means a potentiometer is also connected to D35, and those readings should be used for brightness. Otherwise, set max.
