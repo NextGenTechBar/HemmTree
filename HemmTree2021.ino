@@ -104,7 +104,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.157"
+  "0.158"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -940,7 +940,7 @@ void callback(char* topic, byte* message, unsigned int length) {
       }
   
       //return strip to previous state (fade out then in)
-      for(int i=255;i>0;i--){
+      for(int i=lastBrightnessValue;i>0;i--){
         if(i%5==0){
           strip.setBrightness(i);
           strip.show();
@@ -959,7 +959,7 @@ void callback(char* topic, byte* message, unsigned int length) {
         }
         }
       }
-      for(int i=0;i<255;i++){
+      for(int i=0;i<lastBrightnessValue;i++){
         if(i%5==0){
           for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
           strip.setBrightness(i);
