@@ -104,7 +104,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.158"
+  "0.159"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -994,6 +994,7 @@ void callback(char* topic, byte* message, unsigned int length) {
 }
 
 void reconnect() {
+  int retryCtr=0;
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
@@ -1012,7 +1013,12 @@ void reconnect() {
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
-    }
+
+      retryCtr++;
+      if(retryCtr>5){ //if disconnected from wifi for ~50 seconds (including connect attempt time), restart the ESP to reconnect. Otherwise sometimes it gets stuck in this loop due to some sort of ESP firmware bug
+        ESP.restart();
+      }
+    }   
   }
 }
 void loop() {
