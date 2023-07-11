@@ -14,6 +14,13 @@ C8:C9:A3:F9:02:78
 4C:EB:D6:76:4B:64
 */
 
+/*
+ * Blaine's MAC addresses:
+ * Mini Trees:
+ * D4:D4:DA:53:63:24 - Mom and Dad
+ * D4:D4:DA:46:EB:38 - Mr. Castañeda
+ * /
+
 //to mark new code as valid and prevent rollback. See  esp_ota_mark_app_valid_cancel_rollback() in code
 #include <esp_ota_ops.h>
 
