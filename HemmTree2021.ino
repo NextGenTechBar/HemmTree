@@ -21,7 +21,7 @@ C8:C9:A3:F9:02:78
  * D4:D4:DA:46:EB:38 - Mr. Castañeda
  * D4:D4:DA:59:28:08 - Grandma and Grandpa
  * D4:D4:DA:53:63:2C - Chelsey!
- * /
+ */
 
 //to mark new code as valid and prevent rollback. See  esp_ota_mark_app_valid_cancel_rollback() in code
 #include <esp_ota_ops.h>
@@ -113,7 +113,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.159"
+  "0.160"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1392,6 +1392,20 @@ void firmwareUpdate(void) {
   switch (ret) {
   case HTTP_UPDATE_FAILED:
     Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
+    inCaptivePortal=true;
+    Serial.println("HELP: This probably means the ESP is stuck in a captive portal. Make sure it is registered on the network.");
+    Serial.print("Your MAC address for registration is ");
+    Serial.println(WiFi.macAddress());
+    //light strip orange to indicate captive portal
+    for(int i=0;i<100;i++){
+      if(i%5==0){
+        strip.setPixelColor(i, strip.Color(255/2,100/2,0));
+      }else{
+        strip.setPixelColor(i, strip.Color(0,0,0));
+      }
+      strip.show();
+      delay(10);
+    }
     break;
 
   case HTTP_UPDATE_NO_UPDATES:
@@ -1434,7 +1448,7 @@ int FirmwareVersionCheck(void) {
       } else {
         Serial.print("error in downloading version file:");
         Serial.println(httpCode);
-        if(httpCode==-1){
+        if(httpCode==-1 || httpCode==-101){
           inCaptivePortal=true;
           Serial.println("HELP: This probably means the ESP is stuck in a captive portal. Make sure it is registered on the network.");
           Serial.print("Your MAC address for registration is ");
@@ -1462,8 +1476,22 @@ int FirmwareVersionCheck(void) {
     if (payload.equals(FirmwareVer)) {
       Serial.printf("\nDevice already on latest firmware version:%s\n", FirmwareVer);
       return 0;
-    }
-    else 
+    }else if(payload.length()>10){ //in captive portal sometimes it just returns a long string of HTML here instead of the firmware version
+      inCaptivePortal=true;
+      Serial.println("HELP: This probably means the ESP is stuck in a captive portal. Make sure it is registered on the network.");
+      Serial.print("Your MAC address for registration is ");
+      Serial.println(WiFi.macAddress());
+      //light strip orange to indicate captive portal
+      for(int i=0;i<100;i++){
+        if(i%5==0){
+          strip.setPixelColor(i, strip.Color(255/2,100/2,0));
+        }else{
+          strip.setPixelColor(i, strip.Color(0,0,0));
+        }
+        strip.show();
+        delay(10);
+      }
+    }else 
     {
       Serial.println(payload);
       Serial.println("New firmware detected");
