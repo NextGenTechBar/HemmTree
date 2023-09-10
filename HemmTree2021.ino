@@ -113,7 +113,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.160"
+  "0.161"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -458,6 +458,11 @@ void callback(char* topic, byte* message, unsigned int length) {
         firmwareUpdate();
       }
     }
+
+    if(messageTemp=="WHOSTHERE"){
+      client.publish("GUHemmTree/connectionLog",("PING,"+deviceMacAddress+",v"+FirmwareVer).c_str());
+    }
+    
   
     if(messageTemp.substring(0,5)=="PULSE"){ //send for example, PULSE9 to pulse strip 9 times. Intended use case is to pulse the hour
       int numPulses=messageTemp.substring(5).toInt();
