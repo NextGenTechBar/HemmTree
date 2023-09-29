@@ -17,10 +17,10 @@ C8:C9:A3:F9:02:78
 /*
  * Blaine's MAC addresses:
  * Mini Trees:
- * D4:D4:DA:53:63:24 - Mom and Dad
- * D4:D4:DA:46:EB:38 - Mr. Castañeda
- * D4:D4:DA:59:28:08 - Grandma and Grandpa
- * D4:D4:DA:53:63:2C - Chelsey!
+ * D4:D4:DA:53:63:24 - Mom and Dad  --needs isMiniTree pin modified
+ * D4:D4:DA:46:EB:38 - Mr. Castañeda  --needs isMiniTree pin modified
+ * D4:D4:DA:59:28:08 - Grandma and Grandpa  --needs isMiniTree pin modified
+ * D4:D4:DA:53:63:2C - Chelsey!  --needs isMiniTree pin modified
  */
 
 //to mark new code as valid and prevent rollback. See  esp_ota_mark_app_valid_cancel_rollback() in code
@@ -113,7 +113,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.161"
+  "0.162"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -348,7 +348,7 @@ void setup_wifi() {
     //set lights to indicate that we are in config mode
     for(int i=0;i<stripLength;i++){
       if(i%5==0){
-        strip.setPixelColor(i, strip.Color(0,0,50));
+        stripUpdate(i,0,0,50);
       }else{
         strip.setPixelColor(i, strip.Color(0,0,0));
       }
@@ -460,7 +460,7 @@ void callback(char* topic, byte* message, unsigned int length) {
     }
 
     if(messageTemp=="WHOSTHERE"){
-      client.publish("GUHemmTree/connectionLog",("PING,"+deviceMacAddress+",v"+FirmwareVer).c_str());
+      client.publish("GUHemmTree/connectionLog",("PING,"+deviceMacAddress).c_str());
     }
     
   
@@ -1039,7 +1039,7 @@ void loop() {
   if (!client.connected()) {
     reconnect();
     if(justBooted && client.connected()){
-      client.publish("GUHemmTree/connectionLog",("BOOT,"+deviceMacAddress+",v"+FirmwareVer).c_str()); //only do this the first time
+      client.publish("GUHemmTree/connectionLog",("BOOT,"+deviceMacAddress).c_str()); //only do this the first time
       justBooted=false;
     }else if(!justBooted && client.connected()){
       client.publish("GUHemmTree/connectionLog",("RECONNECT,"+deviceMacAddress).c_str()); //do this any time we were reconnecting and re-established connection
@@ -1047,7 +1047,7 @@ void loop() {
   }else if(inCaptivePortal){ //if we were in a captive portal (showing orange), but got here that means we aren't anymore so we should update the strip to stop being orange
     inCaptivePortal=false;
     for(int i=0;i<strip.numPixels();i++){
-      strip.setPixelColor(i, strip.Color(255,255,255));
+      strip.setPixelColor(i, strip.Color(40,40,40));
       strip.show();
       delay(15);
     }
@@ -1404,7 +1404,7 @@ void firmwareUpdate(void) {
     //light strip orange to indicate captive portal
     for(int i=0;i<100;i++){
       if(i%5==0){
-        strip.setPixelColor(i, strip.Color(255/2,100/2,0));
+        stripUpdate(i,255/2,100/2,0);
       }else{
         strip.setPixelColor(i, strip.Color(0,0,0));
       }
@@ -1461,7 +1461,7 @@ int FirmwareVersionCheck(void) {
           //light strip orange to indicate captive portal
           for(int i=0;i<100;i++){
             if(i%5==0){
-              strip.setPixelColor(i, strip.Color(255/2,100/2,0));
+              stripUpdate(i,255/2,100/2,0);
             }else{
               strip.setPixelColor(i, strip.Color(0,0,0));
             }
@@ -1489,7 +1489,7 @@ int FirmwareVersionCheck(void) {
       //light strip orange to indicate captive portal
       for(int i=0;i<100;i++){
         if(i%5==0){
-          strip.setPixelColor(i, strip.Color(255/2,100/2,0));
+          stripUpdate(i,255/2,100/2,0);
         }else{
           strip.setPixelColor(i, strip.Color(0,0,0));
         }
