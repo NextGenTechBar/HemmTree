@@ -21,6 +21,7 @@ C8:C9:A3:F9:02:78
  * D4:D4:DA:46:EB:38 - Mr. Castañeda  --needs isMiniTree pin modified
  * D4:D4:DA:59:28:08 - Grandma and Grandpa  --needs isMiniTree pin modified
  * D4:D4:DA:53:63:2C - Chelsey!  --needs isMiniTree pin modified
+ * D4:D4:DA:59:27:A4 - Kenzie --needs isMiniTree pin modified
  */
 
 //to mark new code as valid and prevent rollback. See  esp_ota_mark_app_valid_cancel_rollback() in code
