@@ -107,14 +107,14 @@ bool inCaptivePortal=false;
 bool brightnessPotConnected=false;
 int lastBrightnessValue=255;
 
-bool isMiniTree=false; //setup will read pin 35 and set this true if the pin is connected, indicating it is a mini-tree
+bool isMiniTree=false; //setup will read pin 13 and set this true if the pin is connected, indicating it is a mini-tree
 
 // LED Pin
 const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.162"
+  "0.163"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -151,18 +151,25 @@ void setup() {
     Serial.println("RGB");
   }
 
-  pinMode(35,INPUT_PULLUP);
+  deviceMacAddress = WiFi.macAddress();
+  Serial.println("BEGIN MAC: ");
+  Serial.println(deviceMacAddress);
+
+  pinMode(13,INPUT_PULLUP);
   delay(10); //give voltage levels time to stabalize before reading config pins
-  if(!digitalRead(35)){
+  if(!digitalRead(13)){
+    isMiniTree=true; 
+  }
+  //This next line is because I handed out several mini trees before realizing the wrong pin was grounded (it was 35 instead of 13). This line ensures those few trees behave as mini trees anyway
+  //order: Mom&Dad, Mr. Castaneda, G&G, Chelsey, Kenzie
+  if(deviceMacAddress=="D4:D4:DA:53:63:24" || deviceMacAddress=="D4:D4:DA:46:EB:38" || deviceMacAddress=="D4:D4:DA:59:28:08" || deviceMacAddress=="D4:D4:DA:53:63:2C" || deviceMacAddress=="D4:D4:DA:59:27:A4"){
     isMiniTree=true; 
   }
   
   
   randomSeed(analogRead(35));
 
-  deviceMacAddress = WiFi.macAddress();
-  Serial.println("BEGIN MAC: ");
-  Serial.println(deviceMacAddress);
+  
 
   //neopixel setup
     // This is for Trinket 5V 16MHz, you can remove these three lines if you are not using a Trinket
