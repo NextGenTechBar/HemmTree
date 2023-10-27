@@ -43,7 +43,7 @@ This assumes you already have the Arduino IDE installed with ESP32 boards. If no
 
 <b>Too Bright?</b> By default, strips operate at maximum brightness. Optionally, you can connect a potentiometer to control how bright the strip is. To do this, solder pin D14 permenantly to ground to put the ESP32 in custom brightness mode. Then connect a potentiometer to pin D34 (power the ends of the potentiometer with GND and 3.3 volts). Note: brightness changes will only be reflected when the strip changes state.
 
-Note: if pin D35 is grounded, the client will be identified as a mini-tree. As of writing, the mini-tree is still in development so this may or may not have any impact on behavior.
+Note: if pin D13 is grounded, the client will be identified as a mini-tree. As of writing, the mini-tree is still in development so this may or may not have any impact on behavior.
 
 <br><br>
 
