@@ -81,7 +81,7 @@ int mode1firstPixelHue=0;
 long mode3firstPixelHue=0;
 int mode3a=0;
 
-int mode2ctr=0;
+int mode2ctr=0; //these also used in mode7
 int mode2r=0;
 int mode2g=0;
 int mode2b=0;
@@ -96,6 +96,10 @@ int mode3directionB=1;
 bool mode4PulseOn=true;
 int mode4ctr=0;
 int mode4SpeedFactor;
+
+uint8_t* stripCopyRed; //an array to store a copy of the strip values in. Useful for modes like twinkle() when each LED's next state is based on it's own previous state. This size will be set to stripLength at runtime
+uint8_t* stripCopyGreen;
+uint8_t* stripCopyBlue;
 
 bool RGB; //logic in setup() for which strip type to use
 bool GRB;
@@ -114,7 +118,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.163"
+  "0.164"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -225,7 +229,9 @@ void setup() {
   strip.updateType(NEO_GRB + NEO_KHZ800);
   strip.setPin(PIN);
   strip.updateLength(stripLength);
-
+  stripCopyRed=(uint8_t*)calloc(stripLength,sizeof(uint8_t)); //set size of stripCopy to be equal to strip length
+  stripCopyGreen=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
+  stripCopyBlue=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
 
   strip.begin();
   strip.setBrightness(255);
@@ -385,6 +391,9 @@ void setup_wifi() {
       strip.clear(); //clear entire strip before potentially shortening length, so excess lights are off
       strip.show();
       strip.updateLength(stripLength);
+      stripCopyRed=(uint8_t*)calloc(stripLength,sizeof(uint8_t)); //set size of stripCopy to be equal to strip length
+      stripCopyGreen=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
+      stripCopyBlue=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
       
       //WRITE NEW STRIPLENGTH TO EEPROM
       int boardId = 18;
@@ -1008,6 +1017,8 @@ void callback(char* topic, byte* message, unsigned int length) {
         dynamMode=5;
       }else if(messageTemp.substring(5)=="twinkle"){
         dynamMode=6;
+      }else if(messageTemp.substring(5)=="multicolorwipe"){
+        dynamMode=7;
       }
     }else if (messageTemp.substring(0,5)!="PULSE" && messageTemp.substring(0,5)!="SHORT"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
       dynamMode=0; 
@@ -1106,6 +1117,8 @@ void loop() {
     pulses();
   }else if(dynamMode==6){
     twinkle();
+  }else if(dynamMode==7){
+    multiColorWipe();
   }
   
 
@@ -1324,10 +1337,17 @@ void pulses(){
   
 }
 
-void twinkle(){  //BROKEN! Works at first, but then if you do a SHORT mode, it breaks until a reboot
+void twinkle(){
   if(setupMode){
+    Serial.print("TWINKLE_setup");
     for(int i=0; i<stripLength; i++) {
-      stripUpdate(i,random(2,253),random(2,253),random(2,253));
+      uint8_t randomr=random(2,253);
+      uint8_t randomg=random(2,253);
+      uint8_t randomb=random(2,253);
+      strip.setPixelColor(i,strip.Color(randomr,randomg,randomb));
+      stripCopyRed[i]=randomr;
+      stripCopyGreen[i]=randomg;
+      stripCopyBlue[i]=randomb;
       if(stripLength==18){
         delay(25);
       }else{
@@ -1337,21 +1357,17 @@ void twinkle(){  //BROKEN! Works at first, but then if you do a SHORT mode, it b
     }
   }
 
-
   for(int i=0;i<stripLength;i++){
-    uint8_t ra =(strip.getPixelColor(i) >> 16);
-    uint8_t ga =(strip.getPixelColor(i) >> 8);
-    uint8_t ba =(strip.getPixelColor(i));
+    //uint8_t ra =(strip.getPixelColor(i) >> 16); //DON'T USE THIS FUNCTION, REFERENCE GLOBAL COPY INSTEAD
+    //uint8_t ga =(strip.getPixelColor(i) >> 8);
+    //uint8_t ba =(strip.getPixelColor(i));
 
-    int r=ra;
-    int g=ga;
-    int b=ba;
+    int r=stripCopyRed[i];
+    int g=stripCopyGreen[i];
+    int b=stripCopyBlue[i];
     
     if(r%2==0){ //if even, go up
       r+=2;
-      if(i==0){
-        Serial.println(r);
-      }
     }else{ //if odd, go down
       r-=2;
     }
@@ -1381,15 +1397,66 @@ void twinkle(){  //BROKEN! Works at first, but then if you do a SHORT mode, it b
     g = constrain(g,2,253);
     b = constrain(b,2,253);
 
-/*
-    if(i==0){
-      Serial.println(r);
-    }
-*/
     strip.setPixelColor(i,strip.Color(r,g,b));
+    stripCopyRed[i]=r;
+    stripCopyGreen[i]=g;
+    stripCopyBlue[i]=b;
   }
   strip.show();
-  delay(5);
+  delay(8);
+}
+
+void multiColorWipe(){
+  //reusing mode2 variables because they're very similar and won't be used simultaniously anyway
+  if(setupMode){
+    mode2r = random(0,255);
+    mode2g = random(0,255);
+    mode2b = random(0,255);
+    mode2ctr=0;
+  }
+
+  stripUpdate(mode2ctr,mode2r,mode2g,mode2b);
+  strip.show();
+  if(stripLength==18){
+    delay(100);  
+  }else{
+    delay(50);
+  }
+  
+  mode2ctr++;
+  if(mode2ctr>=stripLength){
+    mode2ctr=0;
+  }
+  if(random(0,10)==0){ //certain percentage of the time, change the color
+    //the below is to ensure distinct colors so everything isn't just vaugely pastel
+    if(random(0,4)==0){ //25% of the time
+      mode2r = random(30,220);
+    }else{
+      if(random(0,2)==0){
+        mode2r = random(0,30);  
+      }else{
+        mode2r = random(220,255);
+      }
+    }
+    if(random(0,4)==0){ //25% of the time
+      mode2g = random(30,220);
+    }else{
+      if(random(0,2)==0){
+        mode2g = random(0,30);  
+      }else{
+        mode2g = random(220,255);
+      }
+    }
+    if(random(0,4)==0){ //25% of the time
+      mode2b = random(30,220);
+    }else{
+      if(random(0,2)==0){
+        mode2b = random(0,30);  
+      }else{
+        mode2b = random(220,255);
+      }
+    }
+  }
 }
 
 
