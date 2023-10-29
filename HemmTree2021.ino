@@ -97,6 +97,8 @@ bool mode4PulseOn=true;
 int mode4ctr=0;
 int mode4SpeedFactor;
 
+int twinkleBeginCtr=0; //used to fade in to twinkle mode slower at the beginning
+
 uint8_t* stripCopyRed; //an array to store a copy of the strip values in. Useful for modes like twinkle() when each LED's next state is based on it's own previous state. This size will be set to stripLength at runtime
 uint8_t* stripCopyGreen;
 uint8_t* stripCopyBlue;
@@ -118,7 +120,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.164"
+  "0.165"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -273,9 +275,9 @@ for(int i=0;i<255;i++){
   //all white on boot
   for(int i=0;i<stripLength;i++){
     if(isMiniTree){ //set mini trees to less bright on boot, otherwise max brightness white will overwhelm potential 1A power supply, not giving them a chance to boot fully and enable lower-brightness mode (if set by pin)
-      strip.setPixelColor(i, strip.Color(40,40,40));
+      stripUpdate(i,40,40,40);
     }else{
-      strip.setPixelColor(i, strip.Color(255,255,255));
+      stripUpdate(i,255,255,255);
     }
     if(stripLength==18){
       delay(25);
@@ -323,11 +325,22 @@ for(int i=0;i<255;i++){
 void stripUpdate(int pixel,int r,int g,int b){
   if(RGB){
     strip.setPixelColor(pixel, strip.Color(r,g,b));
+    stripCopyRed[pixel]=r;
+    stripCopyGreen[pixel]=g;
+    stripCopyBlue[pixel]=b;
   }else if(GRB){
     strip.setPixelColor(pixel, strip.Color(g,r,b));
+    stripCopyRed[pixel]=g;
+    stripCopyGreen[pixel]=r;
+    stripCopyBlue[pixel]=b;
   }else if(BRG){
     strip.setPixelColor(pixel, strip.Color(r,b,g));
+    stripCopyRed[pixel]=r;
+    stripCopyGreen[pixel]=b;
+    stripCopyBlue[pixel]=g;
   }
+
+  
 }
 
 void setup_wifi() {
@@ -682,7 +695,9 @@ void callback(char* topic, byte* message, unsigned int length) {
       if(messageTemp.substring(5)=="rainbow"){ //stationary rainbow. different from animation of rainbow
         for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
           int pixelHue = 0 + (i * 65536L / strip.numPixels());
-          strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+          uint32_t tempPixelHue = strip.gamma32(strip.ColorHSV(pixelHue));
+          //strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+          stripUpdateHSV(i,tempPixelHue); //update stripCopy even though we're not using the stripUpdate() function
             if(stripLength==18){
                 delay(25);
             }else{
@@ -1133,7 +1148,9 @@ void rainbow(){
   
   for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
     int pixelHue = mode1firstPixelHue + (i * 65536L / strip.numPixels());
-    strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+    //strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+    uint32_t tempPixelHue = strip.gamma32(strip.ColorHSV(pixelHue));
+    stripUpdateHSV(i, tempPixelHue); //store current color in stripCopy even though we're not using stripUpdate()
     if(setupMode){ //if it's the first time, incrementally set strip to rainbow colors as a transition
       if(stripLength==18){
           delay(25);
@@ -1219,7 +1236,8 @@ void chase(){
       // of the strip (strip.numPixels() steps):
       int      hue   = mode3firstPixelHue + c * 65536L / strip.numPixels();
       uint32_t color = strip.gamma32(strip.ColorHSV(hue)); // hue -> RGB
-      strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
+      //strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
+      stripUpdateHSV(c,color); //update stripCopy even though we're not using stripUpdate()
     }
     strip.show();                // Update strip with new contents
     delay(wait);                 // Pause for a moment
@@ -1338,23 +1356,8 @@ void pulses(){
 }
 
 void twinkle(){
-  if(setupMode){
-    Serial.print("TWINKLE_setup");
-    for(int i=0; i<stripLength; i++) {
-      uint8_t randomr=random(2,253);
-      uint8_t randomg=random(2,253);
-      uint8_t randomb=random(2,253);
-      strip.setPixelColor(i,strip.Color(randomr,randomg,randomb));
-      stripCopyRed[i]=randomr;
-      stripCopyGreen[i]=randomg;
-      stripCopyBlue[i]=randomb;
-      if(stripLength==18){
-        delay(25);
-      }else{
-       delay(5); 
-      }
-      strip.show();
-    }
+  if(setupMode){ //If we ever update stripCopy EVERY time we update the strip, we should change this to start at the previous mode and twinkle out from there instead of filling with random
+    twinkleBeginCtr=0;
   }
 
   for(int i=0;i<stripLength;i++){
@@ -1403,7 +1406,12 @@ void twinkle(){
     stripCopyBlue[i]=b;
   }
   strip.show();
-  delay(8);
+  if(twinkleBeginCtr<50){ //make the initial transition slower than the regular twinkle mode so people can see it's fading from the previou smode
+    delay(15);
+    twinkleBeginCtr++;
+  }else{
+    delay(8);
+  }
 }
 
 void multiColorWipe(){
@@ -1586,4 +1594,14 @@ int FirmwareVersionCheck(void) {
     }
   } 
   return 0;  
+}
+
+void stripUpdateHSV(int pixel, uint32_t c){
+  int r;
+  int g;
+  int b;
+  r = (uint8_t)(c >> 16),
+  g = (uint8_t)(c >>  8),
+  b = (uint8_t)c;
+  stripUpdate(pixel,r,g,b);
 }
