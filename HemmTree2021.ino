@@ -14,6 +14,36 @@ C8:C9:A3:F9:02:78
 4C:EB:D6:76:4B:64
 */
 
+/*Tech Bar lights:
+ *   -- front sign&desk
+ *   -- back desk
+ *   -- side desk
+ */
+
+/*
+ * NGTB's Mini Hemm Trees:     (which is Ish's?)
+EC:62:60:FD:83:E0
+EC:62:60:FE:29:70
+EC:62:60:FE:0F:94
+EC:62:60:FE:10:54
+EC:62:60:FE:A7:A0
+EC:62:60:FD:83:E8
+EC:62:60:FD:7D:7C
+EC:62:60:FD:88:A8
+EC:62:60:FE:28:94
+EC:62:60:FE:A8:44
+EC:62:60:FE:15:70
+EC:62:60:FD:7D:84
+EC:62:60:FD:86:80
+EC:62:60:FE:A8:30
+EC:62:60:FD:82:48
+EC:62:60:FE:10:9C
+EC:62:60:FE:A8:5C
+EC:62:60:FD:88:4C
+EC:62:60:FD:8E:4C
+EC:62:60:FD:8D:EC 
+ */
+
 /*
  * Blaine's MAC addresses:
  * Mini Trees:
