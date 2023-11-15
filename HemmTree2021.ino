@@ -15,9 +15,9 @@ C8:C9:A3:F9:02:78
 */
 
 /*Tech Bar lights:
- *   -- front sign&desk
- *   -- back desk
- *   -- side desk
+08:3A:F2:AA:22:90 -- front sign&desk
+08:3A:F2:A9:E5:78 -- back desk
+08:3A:F2:A9:E5:78 -- side desk
  */
 
 /*
@@ -28,7 +28,7 @@ EC:62:60:FE:0F:94
 EC:62:60:FE:10:54
 EC:62:60:FE:A7:A0
 EC:62:60:FD:83:E8
-EC:62:60:FD:7D:7C
+EC:62:60:FD:7D:7C - on Ish's desk
 EC:62:60:FD:88:A8
 EC:62:60:FE:28:94
 EC:62:60:FE:A8:44
