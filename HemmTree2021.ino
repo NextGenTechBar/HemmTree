@@ -56,6 +56,7 @@ EC:62:60:FD:8D:EC
  * 
  * Loans:
  * D4:D4:DA:59:28:40 - Spokane JVs
+ * D4:D4:DA:59:28:14 - Thompson
  */
 
 //to mark new code as valid and prevent rollback. See  esp_ota_mark_app_valid_cancel_rollback() in code
