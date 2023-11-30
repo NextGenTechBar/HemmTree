@@ -80,6 +80,7 @@ for i in range(len(additionalMacs)):
 if(len(additionalMacs)>0):
     print("")
     print("Additional MACs in log not in known MAC list: ")
+    print("WARNING: possible bug -- first value in this list may actually be in the known mac list")
     for i in range(len(additionalMacs)):
         online = ""
         if(("BOOT" in lastSeenAdditional[i]) or ("RECONNECT" in lastSeenAdditional[i]) or ("PING" in lastSeenAdditional[i])):
