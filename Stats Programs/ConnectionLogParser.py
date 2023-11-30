@@ -12,7 +12,10 @@ def cell(text: str, num: int):
     if(num==1):
         return(text[0:find_nth(text,",",num)])
     else:
-        return(text[find_nth(text,",",num-1)+1:find_nth(text,",",num)])
+        if(find_nth(text,",",num)==-1): #last column
+            return(text[find_nth(text,",",num-1)+1:])
+        else:
+            return(text[find_nth(text,",",num-1)+1:find_nth(text,",",num)])
 
 def find_nth(haystack: str, needle: str, n: int) -> int:
     start = haystack.find(needle)
@@ -51,3 +54,35 @@ for i in range(len(people)):
     if(("BOOT" in lastSeen[i]) or ("RECONNECT" in lastSeen[i]) or ("PING" in lastSeen[i])):
         online= "**"
     print(online+people[i] + " -- " + lastSeen[i])
+
+
+additionalMacs=[]
+#now check if there's any logged MACs that aren't in the list of mac addresses
+with open('Connection Log.csv', newline='') as csvfile:
+    spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+    for row in spamreader:
+        #print(', '.join(row))
+        rowValue=(', '.join(row))
+        mac=cell(rowValue,4)
+        if(not(mac in macs) and not(mac in additionalMacs)):
+            additionalMacs.append(mac)
+
+lastSeenAdditional = ["Never"] * len(additionalMacs)
+
+for i in range(len(additionalMacs)):
+    with open('Connection Log.csv', newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            #print(', '.join(row))
+            rowValue=(', '.join(row))
+            if(additionalMacs[i] in rowValue):
+                lastSeenAdditional[i]=rowValue
+if(len(additionalMacs)>0):
+    print("")
+    print("Additional MACs in log not in known MAC list: ")
+    for i in range(len(additionalMacs)):
+        online = ""
+        if(("BOOT" in lastSeenAdditional[i]) or ("RECONNECT" in lastSeenAdditional[i]) or ("PING" in lastSeenAdditional[i])):
+            online= "**"
+        print(online+lastSeenAdditional[i])
+           
