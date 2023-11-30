@@ -1,63 +1,6 @@
+//MAC list moved to seperate file in GitHub -- https://github.com/NextGenTechBar/HemmTree/blob/main/HemmTreeMacAddresses.csv
 #include <WiFi.h>
 #include <PubSubClient.h>
-
-/*
-Ornament MAC addresses as of 8/8/22
-58:BF:25:81:7B:18
-C8:C9:A3:F9:02:78
-58:BF:25:16:B4:B0
-4C:EB:D6:75:C7:54
-94:B9:7E:FA:13:64
-58:BF:25:83:B5:D4
-58:BF:25:81:65:2C
-58:BF:25:83:8D:54
-4C:EB:D6:76:4B:64
-*/
-
-/*Tech Bar lights:
-08:3A:F2:AA:22:90 -- front sign&desk
-08:3A:F2:A9:E5:78 -- back desk
-08:3A:F2:A9:E5:78 -- side desk
- */
-
-/*
- * NGTB's Mini Hemm Trees:     (which is Ish's?)
-EC:62:60:FD:83:E0
-EC:62:60:FE:29:70
-EC:62:60:FE:0F:94
-EC:62:60:FE:10:54
-EC:62:60:FE:A7:A0
-EC:62:60:FD:83:E8
-EC:62:60:FD:7D:7C - on Ish's desk
-EC:62:60:FD:88:A8
-EC:62:60:FE:28:94
-EC:62:60:FE:A8:44
-EC:62:60:FE:15:70
-EC:62:60:FD:7D:84
-EC:62:60:FD:86:80
-EC:62:60:FE:A8:30
-EC:62:60:FD:82:48
-EC:62:60:FE:10:9C
-EC:62:60:FE:A8:5C
-EC:62:60:FD:88:4C
-EC:62:60:FD:8E:4C
-EC:62:60:FD:8D:EC 
- */
-
-/*
- * Blaine's MAC addresses:
- * Mini Trees:
- * D4:D4:DA:53:63:24 - Mom and Dad  --needs isMiniTree pin modified
- * D4:D4:DA:46:EB:38 - Mr. Castañeda  --needs isMiniTree pin modified
- * D4:D4:DA:59:28:08 - Grandma and Grandpa  --needs isMiniTree pin modified
- * D4:D4:DA:53:63:2C - Chelsey!  --needs isMiniTree pin modified
- * D4:D4:DA:59:27:A4 - Kenzie --needs isMiniTree pin modified
- * D4:D4:DA:59:28:04 - Emma Gashi
- * 
- * Loans:
- * D4:D4:DA:59:28:40 - Spokane JVs
- * D4:D4:DA:59:28:14 - Thompson
- */
 
 //to mark new code as valid and prevent rollback. See  esp_ota_mark_app_valid_cancel_rollback() in code
 #include <esp_ota_ops.h>
