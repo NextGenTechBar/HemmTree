@@ -1,7 +1,7 @@
-#This program will parse your stats file and only count commands that are unique from the previous command (eg: red,green,green,green,red gets counted as 3 instead of 5)
-#In the future, it would be nice for the output to be another csv that discards the unwanted values
+#This program reads in a stats file and counts only the non-repeating values. For example, (red,green,green,green,red) would count as 3 instead of 5
+#in the future, it would be good to output a second stats csv that only contains the non-repeated values
 
-#Additionally, it tells the number of unique users and outputs a csv-formatted print with a row for each user and columns for total commands and "useful" commands which is without duplicates.
+#it also prints a the number of unique users, and a csv-formatted list with a row for each user, and a column for total commands and "useful" commands (non-repeating ones)
 
 import csv
 
@@ -17,6 +17,7 @@ def find_nth(haystack: str, needle: str, n: int) -> int:
 
 lastCommand=""
 commandCtr=0;
+totalCommandCtr=0
 
 with open('HemmTreeStats.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -25,8 +26,10 @@ with open('HemmTreeStats.csv', newline='') as csvfile:
         command=cell(rowValue,3)
         if(command!=lastCommand):
             commandCtr+=1
+        totalCommandCtr+=1
         lastCommand=command
 
+print("Total Raw Commands: " +str(totalCommandCtr))
 print("Non-duplicate commands: "+str(commandCtr))
 
 
@@ -58,5 +61,6 @@ for i in range(len(userIDs)):
                     commandsPerUserRemovedDuplicates[i]+=1
             lastCommand=command
 
+print("UserID,total commands,useful commands")
 for i in range(len(userIDs)):
     print(str(userIDs[i])+","+str(commandsPerUser[i])+","+str(commandsPerUserRemovedDuplicates[i]))
