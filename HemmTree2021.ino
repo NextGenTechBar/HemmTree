@@ -98,7 +98,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.165"
+  "0.166"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -901,9 +901,13 @@ void callback(char* topic, byte* message, unsigned int length) {
       }
 
       if(messageTemp.substring(5)=="invalid"){
+        int animSteps=10;
+        if(lastBrightnessValue<200){ //if the strip is dimmer, animate slower cause it'll go faster with fewer brightness levels to iterate through
+          animSteps=3;
+        }
         for(int i=0;i<2;i++){
-          for(int i=255;i>0;i--){
-            if(i%10==0){
+          for(int i=lastBrightnessValue;i>0;i--){ //changed 255 to lastBrightnessValue to prevent mini trees supplied by 1A supply from getting overloaded by suddenly being set to max
+            if(i%animSteps==0){
               strip.setBrightness(i);
               strip.show();
               if(stripLength==18){
@@ -913,8 +917,8 @@ void callback(char* topic, byte* message, unsigned int length) {
               }
             }
           }
-          for(int i=0;i<255;i++){
-            if(i%10==0){
+          for(int i=0;i<lastBrightnessValue;i++){ //changed 255 to lastBrightnessValue to prevent mini trees supplied by 1A supply from getting overloaded by suddenly being set to max
+            if(i%animSteps==0){
               for(int i=0;i<stripLength;i++){
                 stripUpdate(i,255,0,0);
               }
