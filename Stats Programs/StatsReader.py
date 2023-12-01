@@ -6,7 +6,13 @@
 import csv
 
 def cell(text: str, num: int):
-    return(text[find_nth(text,",",num-1)+1:find_nth(text,",",num)])
+    if(num==1):
+        return(text[0:find_nth(text,",",num)])
+    else:
+        if(find_nth(text,",",num)==-1): #last column
+            return(text[find_nth(text,",",num-1)+1:])
+        else:
+            return(text[find_nth(text,",",num-1)+1:find_nth(text,",",num)])
 
 def find_nth(haystack: str, needle: str, n: int) -> int:
     start = haystack.find(needle)
