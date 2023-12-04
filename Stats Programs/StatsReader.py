@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 import time
+import os.path as ospath
 
 #####functions
 def cell(text: str, num: int):
@@ -20,6 +21,40 @@ def find_nth(haystack: str, needle: str, n: int) -> int:
         start = haystack.find(needle, start+len(needle))
         n -= 1
     return start
+
+def countOnlineClients():
+    macs=[]
+    if(not (ospath.isfile('Connection Log.csv'))):
+            print('Please put \'Connection Log.csv\' in this directory to count number of online clients')
+            return("Unknown")
+    with open('Connection Log.csv', newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            #print(', '.join(row))
+            rowValue=(', '.join(row))
+            mac=cell(rowValue,4)
+            if(not(mac in macs)):
+                macs.append(mac)
+    macs.pop(0)
+
+    onlineStatus=[0]*len(macs)
+
+    online_count=0
+    with open('Connection Log.csv', newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            #print(', '.join(row))
+            rowValue=(', '.join(row))
+            for i in range(len(macs)):
+                if (macs[i] in rowValue):
+                    if  ('BOOT' in rowValue) or ('RECONNECT' in rowValue) or ('PING' in rowValue):
+                        onlineStatus[i]=1
+                    else:
+                        onlineStatus[i]=0
+                
+    for i in range(len(onlineStatus)):
+        online_count+=onlineStatus[i]
+    return(online_count)
 #####
 
 ####this part is just an inefficient way to filter out duplicate commands
@@ -48,6 +83,7 @@ while(True):
     uniqueUsers=len(user_counts)
     numCommands=len(data)
     uniqueCommands=str(countCommands())
+    onlineClients=str(countOnlineClients())
 
     ax=fig.add_subplot(111)
 
@@ -65,32 +101,12 @@ while(True):
     ax.text(.7,.87,userNumText,fontsize=12,ha='center',transform=ax.transAxes)
     commandsText=str(uniqueCommands)+" Commands Sent"
     ax.text(.7,.8,commandsText,fontsize=12,ha='center',transform=ax.transAxes)
-
+    clientText=onlineClients+" Clients online"
+    ax.text(.7,.74,clientText,fontsize=10,ha='center',transform=ax.transAxes)
 
     plt.draw()
-    #time.sleep(10) #regenerate plot every x mins
-    plt.pause(60)
+    plt.pause(60) #time interval to regenerate plot
     fig.clear()
     print("Updating chart...")
 
 
-
-
-
-
-
-def cell(text: str, num: int):
-    if(num==1):
-        return(text[0:find_nth(text,",",num)])
-    else:
-        if(find_nth(text,",",num)==-1): #last column
-            return(text[find_nth(text,",",num-1)+1:])
-        else:
-            return(text[find_nth(text,",",num-1)+1:find_nth(text,",",num)])
-
-def find_nth(haystack: str, needle: str, n: int) -> int:
-    start = haystack.find(needle)
-    while start >= 0 and n > 1:
-        start = haystack.find(needle, start+len(needle))
-        n -= 1
-    return start
