@@ -98,7 +98,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.166"
+  "0.167"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1016,6 +1016,8 @@ void callback(char* topic, byte* message, unsigned int length) {
         dynamMode=6;
       }else if(messageTemp.substring(5)=="multicolorwipe"){
         dynamMode=7;
+      }else if(messageTemp.substring(5)=="xmaschase"){
+        dynamMode = 8;
       }
     }else if (messageTemp.substring(0,5)!="PULSE" && messageTemp.substring(0,5)!="SHORT"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
       dynamMode=0; 
@@ -1116,6 +1118,8 @@ void loop() {
     twinkle();
   }else if(dynamMode==7){
     multiColorWipe();
+  }else if(dynamMode == 8){
+    xmasChase();
   }
   
 
@@ -1230,6 +1234,22 @@ void chase(){
     mode3a=0;
   }
   
+}
+//----------------------------------------------------------------------------------------------------------XMAS CHASE---------------------------------------------------------------------------------------
+void xmasChase(){
+  // Serial.println("in xamas chase");
+  uint32_t color = strip.Color(255,   0,   0);
+  for(int b = 0; b < 3; b++) { //  'b' counts from 0 to 2...
+    strip.clear();         //   Set all pixels in RAM to 0 (off)
+    // 'c' counts up from 'b' to end of strip in increments of 3...
+    for(int c = b; c < strip.numPixels(); c += 3) {
+      strip.setPixelColor(c,color);
+    }
+    color = strip.Color(0,   170,   0);
+    strip.setPixelColor(b, color);
+    strip.show();                // Update strip with new contents
+    delay(100);                 // Pause for a moment
+  }
 }
 
 void fade(){
