@@ -98,7 +98,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.168"
+  "0.169"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -886,6 +886,19 @@ void callback(char* topic, byte* message, unsigned int length) {
         for(int i=0;i<stripLength;i++){ strip.setPixelColor(i, strip.Color(tempStorage[i][0],tempStorage[i][1],tempStorage[i][2]));} //DO NOT use stripUpdate()--it will incorrectly swap colors since we are using getpixelcolor
         strip.show();
       }
+        if(messageTemp.substring(5)=="emmag"){ //for Emma Gashi
+          int solidCount=stripLength/6; //the number of LEDs at the very begining and end that are solid red or white
+          for(int i=0;i<solidCount;i++){
+            stripUpdate(i,255,0,0);
+          }
+          for(int i=solidCount;i<stripLength/2;i++){
+            stripUpdate(i,255,0,255*((float(i-solidCount))/(stripLength/2-solidCount)));
+          }
+          for(int i=stripLength/2;i<stripLength;i++){ 
+            stripUpdate(i,255,(255*(float(i-stripLength/2)/(stripLength/2))),255);
+          }
+          strip.show();
+        }
       }
     
   
