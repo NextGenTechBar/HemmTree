@@ -145,8 +145,8 @@ void setup() {
     isMiniTree=true; 
   }
   //This next line is because I handed out several mini trees before realizing the wrong pin was grounded (it was 35 instead of 13). This line ensures those few trees behave as mini trees anyway
-  //order: Mom&Dad, Mr. Castaneda, G&G, Chelsey, Kenzie
-  if(deviceMacAddress=="D4:D4:DA:53:63:24" || deviceMacAddress=="D4:D4:DA:46:EB:38" || deviceMacAddress=="D4:D4:DA:59:28:08" || deviceMacAddress=="D4:D4:DA:53:63:2C" || deviceMacAddress=="D4:D4:DA:59:27:A4"){
+  //order: Mr. Castaneda, G&G, Chelsey, Kenzie
+  if(deviceMacAddress=="D4:D4:DA:46:EB:38" || deviceMacAddress=="D4:D4:DA:59:28:08" || deviceMacAddress=="D4:D4:DA:53:63:2C" || deviceMacAddress=="D4:D4:DA:59:27:A4"){
     isMiniTree=true; 
   }
   
