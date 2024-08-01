@@ -98,7 +98,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.171"
+  "0.172"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -927,9 +927,9 @@ void callback(char* topic, byte* message, unsigned int length) {
             Serial.print(stripCopyGreen[randomLight]);
             Serial.print(",");
             Serial.println(stripCopyBlue[randomLight]);
-            if(!(stripCopyRed[randomLight]==0 && stripCopyGreen[randomLight]==0 && stripCopyBlue[randomLight]==255)){
+            if(!(stripCopyRed[randomLight]==0 && stripCopyGreen[randomLight]==0 && stripCopyBlue[randomLight]==180)){
               validPixel=true;
-              stripUpdate(randomLight,0,0,255);
+              stripUpdate(randomLight,0,0,180);
               strip.show();
               Serial.println("updated!");
             }else{
