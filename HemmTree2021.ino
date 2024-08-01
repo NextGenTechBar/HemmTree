@@ -98,7 +98,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.170"
+  "0.171"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -914,6 +914,32 @@ void callback(char* topic, byte* message, unsigned int length) {
               delay(5); 
             }
             strip.show();
+          }
+        }
+        if(messageTemp.substring(5)=="andrewBlue"){ //for Andrew Culver from USBank who always comes in to change our lights to Blue ❤
+          bool validPixel=false; //change to true once we find a pixel to change that isn't already blue.
+          int randomLight=random(0,stripLength-1);
+          Serial.println(randomLight);
+          for(int i=0;i<stripLength*3;i++){ //dirty check. But if we've tried 3x the number of lights, it's probably safe to say we've done all the lights already...
+            Serial.println("RGB: ");
+            Serial.print(stripCopyRed[randomLight]);
+            Serial.print(",");
+            Serial.print(stripCopyGreen[randomLight]);
+            Serial.print(",");
+            Serial.println(stripCopyBlue[randomLight]);
+            if(!(stripCopyRed[randomLight]==0 && stripCopyGreen[randomLight]==0 && stripCopyBlue[randomLight]==255)){
+              validPixel=true;
+              stripUpdate(randomLight,0,0,255);
+              strip.show();
+              Serial.println("updated!");
+            }else{
+              randomLight=random(0,stripLength-1);
+              Serial.print("loop ");
+              Serial.println(randomLight);
+            }
+            if(validPixel){
+              break;
+            }
           }
         }
       }
