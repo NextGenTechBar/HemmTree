@@ -81,6 +81,11 @@ uint8_t* stripCopyRed; //an array to store a copy of the strip values in. Useful
 uint8_t* stripCopyGreen;
 uint8_t* stripCopyBlue;
 
+uint8_t* stripSecondCopyRed; //an array to store a copy of the strip values in. Used in new twinkle modifier to store the colors in the strip from before the mode is activated.
+uint8_t* stripSecondCopyGreen;
+uint8_t* stripSecondCopyBlue;
+
+
 bool RGB; //logic in setup() for which strip type to use
 bool GRB;
 bool BRG;
@@ -98,7 +103,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.172"
+  "0.173"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -212,6 +217,10 @@ void setup() {
   stripCopyRed=(uint8_t*)calloc(stripLength,sizeof(uint8_t)); //set size of stripCopy to be equal to strip length
   stripCopyGreen=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
   stripCopyBlue=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
+
+  stripSecondCopyRed=(uint8_t*)calloc(stripLength,sizeof(uint8_t)); //set size of stripSecondCopy to be equal to strip length
+  stripSecondCopyGreen=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
+  stripSecondCopyBlue=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
 
   strip.begin();
   strip.setBrightness(255);
@@ -385,6 +394,10 @@ void setup_wifi() {
       stripCopyRed=(uint8_t*)calloc(stripLength,sizeof(uint8_t)); //set size of stripCopy to be equal to strip length
       stripCopyGreen=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
       stripCopyBlue=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
+
+      stripSecondCopyRed=(uint8_t*)calloc(stripLength,sizeof(uint8_t)); //set size of stripSecondCopy to be equal to strip length
+      stripSecondCopyGreen=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
+      stripSecondCopyBlue=(uint8_t*)calloc(stripLength,sizeof(uint8_t));
       
       //WRITE NEW STRIPLENGTH TO EEPROM
       int boardId = 18;
@@ -1092,6 +1105,8 @@ void callback(char* topic, byte* message, unsigned int length) {
         dynamMode=7;
       }else if(messageTemp.substring(5)=="xmaschase"){
         dynamMode = 8;
+      }else if(messageTemp.substring(5)=="twinkleMod"){
+        dynamMode = 9;
       }
     }else if (messageTemp.substring(0,5)!="PULSE" && messageTemp.substring(0,5)!="SHORT"){ //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
       dynamMode=0; 
@@ -1194,6 +1209,8 @@ void loop() {
     multiColorWipe();
   }else if(dynamMode == 8){
     xmasChase();
+  }else if(dynamMode == 9){
+    twinkleMod();
   }
   
 
@@ -1540,6 +1557,79 @@ void multiColorWipe(){
         mode2b = random(220,255);
       }
     }
+  }
+}
+
+//MODIFIER MODES
+void twinkleMod(){
+  if(setupMode){ //If we ever update stripCopy EVERY time we update the strip, we should change this to start at the previous mode and twinkle out from there instead of filling with random
+    twinkleBeginCtr=0;
+    for(int i=0;i<stripLength;i++){
+      stripSecondCopyRed[i]=stripCopyRed[i];
+      stripSecondCopyGreen[i]=stripCopyGreen[i];
+      stripSecondCopyBlue[i]=stripCopyBlue[i];
+    }
+  }
+  
+  for(int i=0;i<stripLength;i++){
+    //uint8_t ra =(strip.getPixelColor(i) >> 16); //DON'T USE THIS FUNCTION, REFERENCE GLOBAL COPY INSTEAD
+    //uint8_t ga =(strip.getPixelColor(i) >> 8);
+    //uint8_t ba =(strip.getPixelColor(i));
+
+    int r=stripCopyRed[i];
+    int g=stripCopyGreen[i];
+    int b=stripCopyBlue[i];
+
+    uint16_t initialR=stripSecondCopyRed[i];
+    uint16_t initialG=stripSecondCopyGreen[i];
+    uint16_t initialB=stripSecondCopyBlue[i];
+
+    if(r%2==0){ //if even, go up
+      r+=2;
+    }else{ //if odd, go down
+      r-=2;
+    }
+    if(g%2==0){ //if even, go up
+      g+=2;
+    }else{ //if odd, go down
+      g-=2;
+    }
+    if(b%2==0){ //if even, go up
+      b+=2;
+    }else{ //if odd, go down
+      b-=2;
+    }
+
+    r = constrain(r,int(initialR*0.5),int(initialR*1.5)); //keep within 50% difference of original strip colors
+    g = constrain(g,int(initialG*0.5),int(initialG*1.5));
+    b = constrain(b,int(initialB*0.5),int(initialB*1.5));
+
+    int dirSwitch=20;
+    if(random(0,dirSwitch)==0){ //certain percentage of the time, add 1 which switches the direction
+      r++;
+    }
+    if(random(0,dirSwitch)==0){
+      g++;
+    }
+    if(random(0,dirSwitch)==0){
+      b++;
+    }
+
+    r = constrain(r,2,253); //keep within range if it goes outside (NOT 0 to 255)
+    g = constrain(g,2,253);
+    b = constrain(b,2,253);
+
+    strip.setPixelColor(i,strip.Color(r,g,b));
+    stripCopyRed[i]=r;
+    stripCopyGreen[i]=g;
+    stripCopyBlue[i]=b;
+  }
+  strip.show();
+  if(twinkleBeginCtr<50){ //make the initial transition slower than the regular twinkle mode so people can see it's fading from the previou smode
+    delay(15);
+    twinkleBeginCtr++;
+  }else{
+    delay(8);
   }
 }
 
