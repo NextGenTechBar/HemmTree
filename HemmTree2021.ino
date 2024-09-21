@@ -103,7 +103,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.173"
+  "0.174"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1600,9 +1600,9 @@ void twinkleMod(){
       b-=2;
     }
 
-    r = constrain(r,int(initialR*0.5),int(initialR*1.5)); //keep within 50% difference of original strip colors
-    g = constrain(g,int(initialG*0.5),int(initialG*1.5));
-    b = constrain(b,int(initialB*0.5),int(initialB*1.5));
+    r = constrain(r,int(initialR*0.7),int(initialR*1.3)); //keep within 30% difference of original strip colors
+    g = constrain(g,int(initialG*0.7),int(initialG*1.3));
+    b = constrain(b,int(initialB*0.7),int(initialB*1.3));
 
     int dirSwitch=20;
     if(random(0,dirSwitch)==0){ //certain percentage of the time, add 1 which switches the direction
