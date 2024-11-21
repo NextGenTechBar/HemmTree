@@ -8,13 +8,16 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <HTTPUpdate.h>
+#include <EEPROM.h>
 
 WiFiClient espClient;
 
-const char* ssid = "Gonzaga Guest"; 
-const char* password = "";
+const char* ssid = "HemmTree Setup"; 
+const char* password = "12345678";
 
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
+
+#define EEPROM_SIZE 12
 
 void setup() {
   Serial.begin(115200);
@@ -25,7 +28,20 @@ void setup() {
   Serial.print("Connecting to ");
   Serial.println(ssid);
 
-  WiFi.persistent(false); //don't save configuration to flash, otherwise it won't start a captive portal which lets the user set the strip length on next boot of real firmware
+  EEPROM.begin(EEPROM_SIZE);
+
+  //Write data into eeprom
+  int address = 0;
+  int boardId = 18;
+  EEPROM.write(address, boardId);//EEPROM.put(address, boardId);
+  address += sizeof(boardId); //update address value
+
+  float param = 46; // CHANGE THIS VALUE TO WHAT YOU WANT THE STRING LENGTH TO BEEEEEEEEEEEEEEEEEEEEEEEE
+  EEPROM.writeFloat(address, param);//EEPROM.put(address, param);
+  EEPROM.commit();
+  EEPROM.end();
+
+  //WiFi.persistent(false); //don't save configuration to flash, otherwise it won't start a captive portal which lets the user set the strip length on next boot of real firmware
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
