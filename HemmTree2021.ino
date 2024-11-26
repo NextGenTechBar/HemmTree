@@ -97,7 +97,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.177"
+  "0.178"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1702,7 +1702,7 @@ void firmwareUpdate(void) {
   //WiFiClientSecure * client = new WiFiClientSecure;
   //client.setCACert(rootCACertificate);
   client.setInsecure(); //prevents having the update the CA certificate periodically (it expiring breaks github updates which SUCKS cause you have to update each ornament manually with the new certificate
-  httpUpdate.setLedPin(LED_BUILTIN, LOW);
+  //httpUpdate.setLedPin(LED_BUILTIN, LOW); //COMMENTING THIS OUT FOR NOW -- It will disable visual tracking of updates on devkit boards, but having it on makes it so that the 75+ mini hemm trees with D15 and D2 shorted (to correct the color order) have the wrong colors after first reboot
   t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
 
   switch (ret) {
