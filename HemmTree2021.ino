@@ -1702,7 +1702,9 @@ void firmwareUpdate(void) {
   //WiFiClientSecure * client = new WiFiClientSecure;
   //client.setCACert(rootCACertificate);
   client.setInsecure(); //prevents having the update the CA certificate periodically (it expiring breaks github updates which SUCKS cause you have to update each ornament manually with the new certificate
-  //httpUpdate.setLedPin(LED_BUILTIN, LOW); //COMMENTING THIS OUT FOR NOW -- It will disable visual tracking of updates on devkit boards, but having it on makes it so that the 75+ mini hemm trees with D15 and D2 shorted (to correct the color order) have the wrong colors after first reboot
+  if(!isMiniTree){ //don't blink the light on mini tress, because they do not have a light and if D15 and D2 are shorted to switch RGB order, setting the LED (which uses pin 2) overrides the color order when it reboots the first time and red/green get swapped
+    httpUpdate.setLedPin(LED_BUILTIN, LOW); //COMMENTING THIS OUT FOR NOW -- It will disable visual tracking of updates on devkit boards, but having it on makes it so that the 75+ mini hemm trees with D15 and D2 shorted (to correct the color order) have the wrong colors after first reboot
+  }
   t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
 
   switch (ret) {
