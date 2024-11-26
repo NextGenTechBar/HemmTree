@@ -30,7 +30,7 @@ int dynamMode = 0; //MQTT message can set this variable. loop() checks it each a
 // Add your MQTT Broker IP address, example:
 //const char* mqtt_server = "192.168.1.144";
 //const char* mqtt_server = "broker.mqtt-dashboard.com";
-const char* mqtt_server = "ngtblights.gonzaga.edu";
+const char* mqtt_server = "52.37.79.188";
 #include <EEPROM.h>//https://github.com/espressif/arduino-esp32/tree/master/libraries/EEPROM
 
 WiFiClient espClient;
@@ -97,7 +97,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.176"
+  "0.177"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
