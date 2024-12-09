@@ -965,6 +965,36 @@ void callback(char* topic, byte* message, unsigned int length) {
           strip.show();
         }
       }
+      if (messageTemp.substring(5) == "julia") { // for Julia
+        int solidCount = stripLength / 6; // The number of LEDs at the very beginning that are solid pink
+        for (int i = 0; i < solidCount; i++) {
+            // Set to solid pink
+            stripUpdate(i, 255, 0, 128); // Pink (255, 0, 128)
+            if (stripLength == 18) {
+                delay(25);
+            } else {
+                delay(5);
+            }
+            strip.show();
+        }
+        for (int i = solidCount; i < stripLength; i++) {
+            // Gradually transition from pink to blue
+            stripUpdate(
+                i,
+                255 - (255 * ((float(i - solidCount)) / (stripLength - solidCount))), // Red decreases to 0
+                0,   // Keep green constant at 0
+                128 + (127 * ((float(i - solidCount)) / (stripLength - solidCount))) // Blue increases to 255
+            );
+            if (stripLength == 18) {
+                delay(25);
+            } else {
+                delay(5);
+            }
+            strip.show();
+        }
+    }
+
+
       if (messageTemp.substring(5) == "andrewBlue") { //for Andrew Culver from USBank who always comes in to change our lights to Blue ❤
         bool validPixel = false; //change to true once we find a pixel to change that isn't already blue.
         int randomLight = random(0, stripLength - 1);
@@ -1061,7 +1091,47 @@ void callback(char* topic, byte* message, unsigned int length) {
           delay(120);
         }
       }
+//      -... --- -.-- ... / -.- .. ... ... .. -. --.
 
+      if (messageTemp.substring(5) == "alex") {
+        for (int i = 0; i < stripLength; i++) {
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(5000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(100);
+        for (int i = 0; i < stripLength; i++) {
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+      }
+      if (messageTemp.substring(5) == "miku") {
+        for (int i = 0; i < 50; i++) {
+          int col = random(0, 3);
+          if (col == 0) {
+            for (int i = 0; i < stripLength; i++) {
+              stripUpdate(i, 24, 155, 204);
+              //024 155 204
+            }
+            strip.show();
+          } else if (col == 1) {
+            for (int i = 0; i < stripLength; i++) {
+              stripUpdate(i, 0, 200, 0);
+            }
+            strip.show();
+          } else {
+            for (int i = 0; i < stripLength; i++) {
+              stripUpdate(i, 255, 255, 255);
+            }
+            strip.show();
+          }
+          delay(100);
+        }
+      }
       if (messageTemp.substring(5) == "emma") {
         for (int i = 0; i < 40; i++) {
           int col = random(0, 2);
@@ -1091,15 +1161,15 @@ void callback(char* topic, byte* message, unsigned int length) {
       }
 
       if (messageTemp.substring(5) == "bluey") {
-        int sequence[] = {200, 200, 200, 400, 400, 600, 400, 400, 400,200, 200, 200, 400, 400, 700, 900};
+        int sequence[] = {200, 200, 200, 400, 400, 600, 400, 400, 400, 200, 200, 200, 400, 400, 700, 900};
         int segmentLength = ceil(strip.numPixels() * 0.1);
 
         for (int k = 0; k < sizeof(sequence) / sizeof(sequence[0]); k++) {
           strip.clear();
           int startingPoint = random(0, strip.numPixels() - segmentLength - 1);
-          if(k==(sizeof(sequence) / sizeof(sequence[0]))-1){ //fill whole strip on last note
-            startingPoint=0;
-            segmentLength=strip.numPixels();
+          if (k == (sizeof(sequence) / sizeof(sequence[0])) - 1) { //fill whole strip on last note
+            startingPoint = 0;
+            segmentLength = strip.numPixels();
           }
           //Serial.print("starting point = ");
           //Serial.println(startingPoint);
@@ -1169,6 +1239,8 @@ void callback(char* topic, byte* message, unsigned int length) {
         dynamMode = 8;
       } else if (messageTemp.substring(5) == "twinkleMod") {
         dynamMode = 9;
+      } else if (messageTemp.substring(5) == "vsa") {
+        dynamMode = 10;
       }
     } else if (messageTemp.substring(0, 5) != "PULSE" && messageTemp.substring(0, 5) != "SHORT") { //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
       dynamMode = 0;
@@ -1273,121 +1345,136 @@ void loop() {
     xmasChase();
   } else if (dynamMode == 9) {
     twinkleMod();
-  }
-
-
+  } else if (dynamMode == 10) {
+    vsa();
+  } 
 }
 
-//DYNAMIC ANIMATION FUNCTIONS
-void rainbow() {
+  //DYNAMIC ANIMATION FUNCTIONS
+  void rainbow() {
 
-  if (setupMode) { //first loop of this function, set it up
-    mode1firstPixelHue = 0;
-  }
-
-  for (int i = 0; i < strip.numPixels(); i++) { // For each pixel in strip...
-    int pixelHue = mode1firstPixelHue + (i * 65536L / strip.numPixels());
-    //strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
-    uint32_t tempPixelHue = strip.gamma32(strip.ColorHSV(pixelHue));
-    stripUpdateHSV(i, tempPixelHue); //store current color in stripCopy even though we're not using stripUpdate()
-    if (setupMode) { //if it's the first time, incrementally set strip to rainbow colors as a transition
-      if (stripLength == 18) {
-        delay(25);
-      } else {
-        delay(5);
-      }
-      strip.show();
+    if (setupMode) { //first loop of this function, set it up
+      mode1firstPixelHue = 0;
     }
-  }
-  strip.show(); // Update strip with new contents
-  delay(11);  // Pause for a moment
 
-  mode1firstPixelHue += 256; //emulating for loop
-  if (mode1firstPixelHue >= 5 * 65536) { //emulating for loop
-    mode1firstPixelHue = 0;
-  }
+    for (int i = 0; i < strip.numPixels(); i++) { // For each pixel in strip...
+      int pixelHue = mode1firstPixelHue + (i * 65536L / strip.numPixels());
+      //strip.setPixelColor(i, strip.gamma32(strip.ColorHSV(pixelHue)));
+      uint32_t tempPixelHue = strip.gamma32(strip.ColorHSV(pixelHue));
+      stripUpdateHSV(i, tempPixelHue); //store current color in stripCopy even though we're not using stripUpdate()
+      if (setupMode) { //if it's the first time, incrementally set strip to rainbow colors as a transition
+        if (stripLength == 18) {
+          delay(25);
+        } else {
+          delay(5);
+        }
+        strip.show();
+      }
+    }
+    strip.show(); // Update strip with new contents
+    delay(11);  // Pause for a moment
 
-}
+    mode1firstPixelHue += 256; //emulating for loop
+    if (mode1firstPixelHue >= 5 * 65536) { //emulating for loop
+      mode1firstPixelHue = 0;
+    }
 
-void colorWipe() {
-  if (setupMode) {
-    mode2r = random(0, 255);
-    mode2g = random(0, 255);
-    mode2b = random(0, 255);
-    mode2ctr = 0;
-  }
-
-  stripUpdate(mode2ctr, mode2r, mode2g, mode2b);
-  strip.show();
-  if (stripLength == 18) {
-    delay(100);
-  } else {
-    delay(30);
   }
 
-  mode2ctr++;
-  if (mode2ctr >= stripLength) { //reset and make new colors
-    delay(500);
-    mode2ctr = 0;
-    if (random(0, 4) == 0) { //25% of the time
-      mode2r = random(30, 220);
+  void colorWipe() {
+    if (setupMode) {
+      mode2r = random(0, 255);
+      mode2g = random(0, 255);
+      mode2b = random(0, 255);
+      mode2ctr = 0;
+    }
+
+    stripUpdate(mode2ctr, mode2r, mode2g, mode2b);
+    strip.show();
+    if (stripLength == 18) {
+      delay(100);
     } else {
-      if (random(0, 2) == 0) {
-        mode2r = random(0, 30);
+      delay(30);
+    }
+
+    mode2ctr++;
+    if (mode2ctr >= stripLength) { //reset and make new colors
+      delay(500);
+      mode2ctr = 0;
+      if (random(0, 4) == 0) { //25% of the time
+        mode2r = random(30, 220);
       } else {
-        mode2r = random(220, 255);
+        if (random(0, 2) == 0) {
+          mode2r = random(0, 30);
+        } else {
+          mode2r = random(220, 255);
+        }
+      }
+      if (random(0, 4) == 0) { //25% of the time
+        mode2g = random(30, 220);
+      } else {
+        if (random(0, 2) == 0) {
+          mode2g = random(0, 30);
+        } else {
+          mode2g = random(220, 255);
+        }
+      }
+      if (random(0, 4) == 0) { //25% of the time
+        mode2b = random(30, 220);
+      } else {
+        if (random(0, 2) == 0) {
+          mode2b = random(0, 30);
+        } else {
+          mode2b = random(220, 255);
+        }
       }
     }
-    if (random(0, 4) == 0) { //25% of the time
-      mode2g = random(30, 220);
-    } else {
-      if (random(0, 2) == 0) {
-        mode2g = random(0, 30);
-      } else {
-        mode2g = random(220, 255);
+  }
+
+  void chase() {
+    if (setupMode) {
+      mode3firstPixelHue = 0;
+      mode3a = 0;
+    }
+    int wait = 60;
+
+    for (int b = 0; b < 3; b++) { //  'b' counts from 0 to 2...
+      strip.clear();         //   Set all pixels in RAM to 0 (off)
+      // 'c' counts up from 'b' to end of strip in increments of 3...
+      for (int c = b; c < strip.numPixels(); c += 3) {
+        // hue of pixel 'c' is offset by an amount to make one full
+        // revolution of the color wheel (range 65536) along the length
+        // of the strip (strip.numPixels() steps):
+        int      hue   = mode3firstPixelHue + c * 65536L / strip.numPixels();
+        uint32_t color = strip.gamma32(strip.ColorHSV(hue)); // hue -> RGB
+        //strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
+        stripUpdateHSV(c, color); //update stripCopy even though we're not using stripUpdate()
       }
+      strip.show();                // Update strip with new contents
+      delay(wait);                 // Pause for a moment
+      mode3firstPixelHue += 65536 / 90; // One cycle of color wheel over 90 frames
     }
-    if (random(0, 4) == 0) { //25% of the time
-      mode2b = random(30, 220);
-    } else {
-      if (random(0, 2) == 0) {
-        mode2b = random(0, 30);
-      } else {
-        mode2b = random(220, 255);
+    mode3a++;
+    if (mode3a > 29) {
+      mode3a = 0;
+    }
+
+  }
+
+  void vsa() {
+    uint32_t color = strip.Color(255,   0,   0);
+    for (int b = 0; b < 4; b++) { //  'b' counts from 0 to 2...
+      // 'c' counts up from 'b' to end of strip in increments of 3...
+      for (int c = b; c < strip.numPixels(); c += 3) {
+        strip.setPixelColor(c, color);
       }
+      color = strip.Color(255,   128,   0);
+      strip.setPixelColor(b, color);
+      strip.show();                // Update strip with new contents
+      delay(100);                 // Pause for a moment
     }
   }
-}
 
-void chase() {
-  if (setupMode) {
-    mode3firstPixelHue = 0;
-    mode3a = 0;
-  }
-  int wait = 60;
-
-  for (int b = 0; b < 3; b++) { //  'b' counts from 0 to 2...
-    strip.clear();         //   Set all pixels in RAM to 0 (off)
-    // 'c' counts up from 'b' to end of strip in increments of 3...
-    for (int c = b; c < strip.numPixels(); c += 3) {
-      // hue of pixel 'c' is offset by an amount to make one full
-      // revolution of the color wheel (range 65536) along the length
-      // of the strip (strip.numPixels() steps):
-      int      hue   = mode3firstPixelHue + c * 65536L / strip.numPixels();
-      uint32_t color = strip.gamma32(strip.ColorHSV(hue)); // hue -> RGB
-      //strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
-      stripUpdateHSV(c, color); //update stripCopy even though we're not using stripUpdate()
-    }
-    strip.show();                // Update strip with new contents
-    delay(wait);                 // Pause for a moment
-    mode3firstPixelHue += 65536 / 90; // One cycle of color wheel over 90 frames
-  }
-  mode3a++;
-  if (mode3a > 29) {
-    mode3a = 0;
-  }
-
-}
 //----------------------------------------------------------------------------------------------------------XMAS CHASE---------------------------------------------------------------------------------------
 void xmasChase() {
   // Serial.println("in xamas chase");
@@ -1702,7 +1789,7 @@ void firmwareUpdate(void) {
   //WiFiClientSecure * client = new WiFiClientSecure;
   //client.setCACert(rootCACertificate);
   client.setInsecure(); //prevents having the update the CA certificate periodically (it expiring breaks github updates which SUCKS cause you have to update each ornament manually with the new certificate
-  if(!isMiniTree){ //don't blink the light on mini tress, because they do not have a light and if D15 and D2 are shorted to switch RGB order, setting the LED (which uses pin 2) overrides the color order when it reboots the first time and red/green get swapped
+  if (!isMiniTree) { //don't blink the light on mini tress, because they do not have a light and if D15 and D2 are shorted to switch RGB order, setting the LED (which uses pin 2) overrides the color order when it reboots the first time and red/green get swapped
     httpUpdate.setLedPin(LED_BUILTIN, LOW); //COMMENTING THIS OUT FOR NOW -- It will disable visual tracking of updates on devkit boards, but having it on makes it so that the 75+ mini hemm trees with D15 and D2 shorted (to correct the color order) have the wrong colors after first reboot
   }
   t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
