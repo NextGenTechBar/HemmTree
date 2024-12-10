@@ -97,12 +97,13 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.179"
+  "0.180"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
+#define Sandbox_URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/Sandbox/ESP32_code_sandbox.bin"
 
-void firmwareUpdate();
+void firmwareUpdate(bool sandbox);
 int FirmwareVersionCheck();
 void stripUpdate();
 
@@ -134,9 +135,9 @@ void setup() {
     Serial.println("RGB");
   }
 
-//  deviceMacAddress = WiFi.macAddress();
-  Serial.println("BEGIN MAC: ");
-  Serial.println(deviceMacAddress);
+ 
+//  deviceMacAddress = WiFi.macAddress(); //DON'T DO THIS HERE -- turns out there was a bug in the older library versions that let this work, but on newer library versions, calling this before WiFi.begin() always returns 00:00:00:00:00:00. Meaning every client tries to connect to the server with the same username and get constantly kicked. This line has been moved to after WiFi.begin()
+  
 
   pinMode(13, INPUT_PULLUP);
   delay(10); //give voltage levels time to stabalize before reading config pins
@@ -297,7 +298,7 @@ void setup() {
   Serial.println(FirmwareVer);
   Serial.println("Will now check for new firmware..");
   if (FirmwareVersionCheck()) {
-    firmwareUpdate();
+    firmwareUpdate(false);
   }
 
   pinMode(ledPin, OUTPUT);
@@ -337,6 +338,7 @@ void setup_wifi() {
 
   Serial.println("Attempting to connect to saved network");
   WiFi.begin();
+  deviceMacAddress = WiFi.macAddress();
   unsigned long startTime = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - startTime < 14000) {
     Serial.print(".");
@@ -456,6 +458,18 @@ void callback(char* topic, byte* message, unsigned int length) {
     }
   }
 
+  if (messageTemp.substring(0, 23) == "SANDBOX_FIRMWARE_UPDATE") {
+    Serial.println("Received command to update from Sandbox");
+    Serial.print("received MAC:");
+    Serial.println(messageTemp.substring(24));
+    Serial.print("My MAC:");
+    Serial.println(deviceMacAddress);
+    if(messageTemp.substring(24) == deviceMacAddress){
+      Serial.println("MATCHED -- will update from sandbox");
+      firmwareUpdate(true);
+    }
+  }
+
   if (messageTemp == "SLEEP") {
     acceptingInput = false;
   }
@@ -470,7 +484,7 @@ void callback(char* topic, byte* message, unsigned int length) {
       Serial.println(FirmwareVer);
       Serial.println("Will now check for new firmware..");
       if (FirmwareVersionCheck()) {
-        firmwareUpdate();
+        firmwareUpdate(false);
       }
     }
 
@@ -2127,7 +2141,17 @@ void twinkleMod() {
 
 
 //GITHUB FIRMWARE UPDATE
-void firmwareUpdate(void) {
+void firmwareUpdate(bool sandbox) { //if firmwareUpdate(true) is called, update from sandbox instead of prod URL.
+
+  //light up LED strip to indicate that we're downloading an update
+  strip.clear();
+    for (int i = 0; i < stripLength; i++) {
+      if (i % 5 == 0) {
+        strip.setPixelColor(i, strip.Color(50, 50, 50));
+      }
+    }
+  strip.show();
+
   WiFiClientSecure client;
   //WiFiClientSecure * client = new WiFiClientSecure;
   //client.setCACert(rootCACertificate);
@@ -2135,7 +2159,13 @@ void firmwareUpdate(void) {
   if (!isMiniTree) { //don't blink the light on mini tress, because they do not have a light and if D15 and D2 are shorted to switch RGB order, setting the LED (which uses pin 2) overrides the color order when it reboots the first time and red/green get swapped
     httpUpdate.setLedPin(LED_BUILTIN, LOW); //COMMENTING THIS OUT FOR NOW -- It will disable visual tracking of updates on devkit boards, but having it on makes it so that the 75+ mini hemm trees with D15 and D2 shorted (to correct the color order) have the wrong colors after first reboot
   }
-  t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
+
+  t_httpUpdate_return ret;
+  if(sandbox){
+    ret = httpUpdate.update(client, Sandbox_URL_fw_Bin);
+  }else{
+    ret = httpUpdate.update(client, URL_fw_Bin);
+  }
 
   switch (ret) {
     case HTTP_UPDATE_FAILED:
@@ -2243,13 +2273,7 @@ int FirmwareVersionCheck(void) {
     {
       Serial.println(payload);
       Serial.println("New firmware detected");
-      strip.clear();
-      for (int i = 0; i < stripLength; i++) {
-        if (i % 5 == 0) {
-          strip.setPixelColor(i, strip.Color(50, 50, 50));
-        }
-      }
-      strip.show();
+      
       return 1;
     }
   }
