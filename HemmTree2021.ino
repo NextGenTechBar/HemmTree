@@ -97,7 +97,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.178"
+  "0.179"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -134,7 +134,7 @@ void setup() {
     Serial.println("RGB");
   }
 
-  deviceMacAddress = WiFi.macAddress();
+//  deviceMacAddress = WiFi.macAddress();
   Serial.println("BEGIN MAC: ");
   Serial.println(deviceMacAddress);
 
@@ -993,7 +993,109 @@ void callback(char* topic, byte* message, unsigned int length) {
             strip.show();
         }
     }
+    if (messageTemp.substring(5) == "truejaxon") {
+        
+        // ------------------------------------------------------------------------------------------------
+        // FIRST: establish a point of origin for the DARKNESS to spread its swift and terrible evil from:
+        
+        // originPoint stores the starting point of the DARKNESS.
+        int originPoint = (0, (stripLength - 1) );
+        
+        // Create the lower and upper bounds of the DARKNESS.
+        int lowerDarkBound = originPoint;
+        int upperDarkBound = originPoint;
+        // darkSpreadCount determines how powerful the DARKNESS is. ( how many LEDS will be disabled.)
+        int darkSpreadCount = 1;
 
+        
+        int tempStorage[stripLength][3];
+        for (uint16_t i = 0; i < stripLength; i++) {
+          uint8_t LEDr = (strip.getPixelColor(i) >> 16);
+          uint8_t LEDg = (strip.getPixelColor(i) >> 8);
+          uint8_t LEDb = (strip.getPixelColor(i)) ;
+          tempStorage[i][0] = LEDr;
+          tempStorage[i][1] = LEDg;
+          tempStorage[i][2] = LEDb;
+        }
+        // Create the lower ( first index to origin) and upper ( origin to last index ) bounds for the light.
+        // The point of origin should never be reclaimed by the light, so it's excluded from the bounds.
+        int lowerLightBound = originPoint - 3;
+        int upperLightBound = originPoint + 3;
+        // lightSpreadCount is a weak, pathetic imitation of the terrifying darkSpreadCount. ( how many LEDS will be disabled.)
+        int lightSpreadCount = 50;
+
+        // ------------------------------------------------------------------------------------------------
+        // SECOND: Begin the unstoppable spread of the DARKNESS:
+
+        /*
+          I must confess that I genuinly have no clue what the LEDS are doing to loop the entire display. I'll just
+          have to work aorund it.
+        */
+        
+        // Begin by spawning patient zero: The begging of the end times:
+        stripUpdate( originPoint, 0, 0, 0 );
+
+        // As the function loops, expand the bounds of DARKNESS and decrement the bounds of light.
+        // NOTE: in order to allow some flickering to occur, the bounds of light and DARKNESS should have some overlap.
+
+        // I'm assuming the current code will loop through all this following stuff and increment as needed.
+        // expand DARKNESS bounds.
+        lowerDarkBound--;
+        upperDarkBound++;
+
+        // Spread DARKNESS randomly.
+        for ( int i = 0; i < darkSpreadCount; i++ ) {
+            int randomLED = random( lowerDarkBound, upperDarkBound );
+            stripUpdate( randomLED, 0, 0, 0 );
+        }
+
+        // ------------------------------------------------------------------------------------------------
+        // THIRD: Watch the light flicker and DIE, diminishing into nothing but broken SPARKS:
+
+        // Once the DARKNESS grows to a certain point, there is NO TURNING BACK. Have the bounds of light decrease.
+        if ( lowerDarkBound <= (originPoint - 5) ) {
+            lowerLightBound--;
+            upperLightBound++;
+        }
+
+        // Let the dying light struggle in vain against the DARKNESS.
+        for ( int i = 0; i < lightSpreadCount; i++ ) {
+            int randomLowerLED = random( 0, lowerLightBound );
+            int randomUpperLED = random( upperLightBound, stripLength);
+            // restore LEDS to previous color.
+            strip.setPixelColor(randomLowerLED, strip.Color(tempStorage[i][0], tempStorage[i][1], tempStorage[i][2]));
+            strip.setPixelColor(randomUpperLED, strip.Color(tempStorage[i][0], tempStorage[i][1], tempStorage[i][2]));
+        }
+
+        // ------------------------------------------------------------------------------------------------
+        // FOURTH: FEEL the awesome POWER of the DARKNESS INCREASE EVERMORE:
+
+        if ( darkSpreadCount < (stripLength * 3) ) {
+           darkSpreadCount++;
+        }
+        if ( lightSpreadCount > 0 ) {
+          lightSpreadCount--;
+        }
+        // NOTE: This may be tweaked later, but for now, TRUE DARKNESS comes into effect when the lightSpread Count becomes zero,
+        // so you can sit helpless and watch the last of hope be utterly SNUFFED OUT when it can no longer spread light.
+
+        // ------------------------------------------------------------------------------------------------
+        // FIFTH: As the DARKNESS expands unstoppably, reflect this change in the hearts of all:
+
+        // Also have the lights get dimmer, cuz' DARKNESS, BABY!
+        int dyingLight = lastBrightnessValue;
+        dyingLight--;
+        strip.setBrightness( dyingLight );
+        lastBrightnessValue = dyingLight;
+
+        strip.show();
+        if (stripLength == 18) {
+          delay(25);
+        } else {
+          delay(5);
+        }
+
+    }
 
       if (messageTemp.substring(5) == "andrewBlue") { //for Andrew Culver from USBank who always comes in to change our lights to Blue ❤
         bool validPixel = false; //change to true once we find a pixel to change that isn't already blue.
@@ -1095,19 +1197,260 @@ void callback(char* topic, byte* message, unsigned int length) {
 
       if (messageTemp.substring(5) == "alex") {
         for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// long
               stripUpdate(i, 255, 255, 255);
         }
         strip.show();
-        delay(5000);
+        delay(2000);
         for (int i = 0; i < stripLength; i++) {
           stripUpdate(i, 0, 0, 0);
         }
         strip.show();
-        delay(100);
-        for (int i = 0; i < stripLength; i++) {
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
               stripUpdate(i, 255, 255, 255);
         }
         strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {//short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {// space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {// space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {// space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) { // space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// long
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(2000);
+        for (int i = 0; i < stripLength; i++) {// space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {// space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) { // space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(200);
+        for (int i = 0; i < stripLength; i++) {// short
+              stripUpdate(i, 255, 255, 255);
+        }
+        strip.show();
+        delay(1000);
+        for (int i = 0; i < stripLength; i++) { // space
+          stripUpdate(i, 0, 0, 0);
+        }
+        strip.show();
+        delay(500);
       }
       if (messageTemp.substring(5) == "miku") {
         for (int i = 0; i < 50; i++) {
