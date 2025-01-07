@@ -1,6 +1,6 @@
 MAC,identifier,Originally Purchased By,Loaned/Owned,device type,notes
-EC:62:60:FE:A7:A0,Mini HemmTree-2 - Registrars,NGTB,Loaned,mini tree v1.3,
-EC:62:60:FE:28:94,Mini HemmTree-1 - Lincoln center,NGTB,Loaned,mini tree v1.3,
+EC:62:60:FE:A7:A0,Mini HemmTree-2,NGTB,,mini tree v1.3,
+EC:62:60:FE:28:94,Mini HemmTree-1,NGTB,,mini tree v1.3,
 EC:62:60:FE:10:9C,John Carnegie,NGTB,Owned,mini tree v1.3,
 EC:62:60:FE:10:54,,NGTB,,mini tree v1.3,needs joint repaired -- last quadrant is intermittant
 08:3A:F2:A9:E5:78,NGTB side desk lights,NGTB,NA,standalone ESP32,
@@ -24,13 +24,13 @@ EC:62:60:FD:83:E8,Mary Hunt,NGTB,Owned,mini tree v1.3,
 EC:62:60:FD:86:80,Mini HemmTree-3,NGTB,,mini tree v1.3,
 EC:62:60:FD:88:4C,Megan Hawley (GUEST intern),NGTB,Owned,mini tree v1.3,
 EC:62:60:FD:88:A8,Mini HemmTree-4 - Dora,NGTB,loaned,mini tree v1.3,
-EC:62:60:FD:8D:EC,Mini HemmTree-5 - SC front desk,NGTB,Loaned,mini tree v1.3,
+EC:62:60:FD:8D:EC,Mini HemmTree-5,NGTB,,mini tree v1.3,
 EC:62:60:FD:8E:4C,Jake V,NGTB,Owned,mini tree v1.3,
 EC:62:60:FE:0F:94,Elise Busse (raffle winner '23),NGTB,Owned,mini tree v1.3,
-EC:62:60:FE:15:70,CSI office,NGTB,Loaned,mini tree v1.3,
+EC:62:60:FE:15:70,,NGTB,,mini tree v1.3,
 EC:62:60:FE:29:70,Mini HemmTree-6,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:30,Mini HemmTree-7,NGTB,,mini tree v1.3,
-EC:62:60:FE:A8:44,Mini HemmTree-8 - Mission & Ministry,NGTB,Loaned,mini tree v1.3,
+EC:62:60:FE:A8:44,Mini HemmTree-8,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:5C,Mini HemmTree-9,NGTB,,mini tree v1.3,
 D4:D4:DA:59:27:E4,Heather & Jason,Blaine,Owned,mini tree v1.2,has level shifter chip fix
 D4:D4:DA:46:EB:38,Mr. Castaneda,Blaine,Owned,mini tree v1.1,needs isminitree pin modified
@@ -45,7 +45,7 @@ D4:D4:DA:59:27:E4,,Blaine,,mini tree v1.2,
 58:BF:25:82:2A:64,NGTB Projects PC,Blaine,Owned,PC Lighting Controller,
 D4:D4:DA:59:27:74,Mackenzie Atkins #2,Blaine,Owned,mini tree v1.2,
 88:13:BF:DF:51:84,Staying on-campus in University Advancement,NGTB,Owned,mini tree v1.4,
-88:13:BF:DF:51:58,GUEST upstairs,NGTB,loaned,mini tree v1.4,one light blue component broken (back side)
+88:13:BF:DF:51:58,,NGTB,,mini tree v1.4,one light blue component broken (back side)
 ",88:13:BF:DF:52:08",2024 donor gift from UA,NGTB,Owned,mini tree v1.4,
 88:13:BF:DF:52:54,2024 donor gift from UA,NGTB,Owned,mini tree v1.4,
 88:13:BF:DF:51:90,2024 donor gift from UA,NGTB,Owned,mini tree v1.4,
@@ -108,13 +108,13 @@ UNKNOWN,Sandra Dillinger - 2024 order,NGTB,Owned,mini tree v1.4,
 88:13:BF:DF:51:BC,Mini HemmTree-2024-1 (registered to ngtb iot) - Collin/Mia/Anna,NGTB,Owned,mini tree v1.4,
 88:13:BF:DF:52:48,Mini HemmTree-2024-2 (registered to ngtb iot) - Kenny's parents,NGTB,Owned,mini tree v1.4,
 88:13:BF:DF:58:84,Mini HemmTree-2024-3 (registered to ngtb iot) - Jake V or his parents,NGTB,owned,mini tree v1.4,
-88:13:BF:DF:51:7C,Mini HemmTree-2024-4 (registered to ngtb iot) - CGE,NGTB,loaned,mini tree v1.4,
+88:13:BF:DF:51:7C,Mini HemmTree-2024-4 (registered to ngtb iot),NGTB,,mini tree v1.4,
 88:13:BF:DF:50:F4,Mini HemmTree-2024-5 (registered to ngtb iot) - Krystal Frias #2,NGTB,Owned,mini tree v1.4,
 88:13:BF:DF:51:28,Mini HemmTree-2024-6 (registered to ngtb iot) - Suzie Mize - 2024 order,NGTB,owned,mini tree v1.4,
-88:13:BF:DF:51:E8,Mini HemmTree-2024-7 (registered to ngtb iot) - Pres office loaner,NGTB,loaned,mini tree v1.4,
+88:13:BF:DF:51:E8,Mini HemmTree-2024-7 (registered to ngtb iot),NGTB,,mini tree v1.4,
 88:13:BF:DF:51:24,Mini HemmTree-2024-8 (registered to ngtb iot) - Coach Kathy,NGTB,owned,mini tree v1.4,
 88:13:BF:DF:51:98,Mini HemmTree-2024-9 (registered to ngtb iot) - Darren,NGTB,owned,mini tree v1.4,
-88:13:BF:DF:52:00,Mini HemmTree-2024-10 (registered to ngtb iot) - CCE downstairs,NGTB,loaned,mini tree v1.4,
+88:13:BF:DF:52:00,Mini HemmTree-2024-10 (registered to ngtb iot),NGTB,,mini tree v1.4,
 88:13:BF:DF:51:50,,NGTB,,mini tree v1.4,two dimensional half-tree
 88:13:BF:DF:51:3C,Registering to NGTB IOT - Anna Marie Medina - 2024 order,NGTB,Owned,mini tree v1.4,blue component dead on one bulb (front)
 88:13:BF:DF:51:C8,Registering to NGTB IOT - Borre,NGTB,owned?,mini tree v1.4,blue component dead on one bulb (back)
