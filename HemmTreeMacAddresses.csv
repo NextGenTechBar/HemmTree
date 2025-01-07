@@ -2,7 +2,7 @@ MAC,identifier,Originally Purchased By,Loaned/Owned,device type,notes
 EC:62:60:FE:A7:A0,Mini HemmTree-2 - Registrars,NGTB,Loaned,mini tree v1.3,
 EC:62:60:FE:28:94,Mini HemmTree-1 - Lincoln center,NGTB,Loaned,mini tree v1.3,
 EC:62:60:FE:10:9C,John Carnegie,NGTB,Owned,mini tree v1.3,
-EC:62:60:FE:10:54,Greg's desk,NGTB,loaned,mini tree v1.3,
+EC:62:60:FE:10:54,,NGTB,,mini tree v1.3,needs joint repaired -- last quadrant is intermittant
 08:3A:F2:A9:E5:78,NGTB side desk lights,NGTB,NA,standalone ESP32,
 08:3A:F2:AA:22:90,NGTB front sign lights,NGTB,NA,standalone ESP32,
 08:3A:F2:AB:AF:1C,NGTB Back desk lights,NGTB,NA,standalone ESP32,
@@ -19,19 +19,19 @@ C8:C9:A3:F9:02:78,HemmTree Ornament 2,NGTB,NA,Ornament,
 EC:62:60:FD:7D:7C,Ish,NGTB,Loaned,mini tree v1.3,
 EC:62:60:FD:7D:84,Jay Spencer's Mom,NGTB,Owned,mini tree v1.3,
 EC:62:60:FD:82:48,Richard Zhang,NGTB,Owned,mini tree v1.3,
-EC:62:60:FD:83:E0,Mini HemmTree-10 - US Bank,NGTB,loaned,mini tree v1.3,one LED has one channel broken
+EC:62:60:FD:83:E0,Mini HemmTree-10,NGTB,,mini tree v1.3,one LED near plug has blue channel broken
 EC:62:60:FD:83:E8,Mary Hunt,NGTB,Owned,mini tree v1.3,
-EC:62:60:FD:86:80,Mini HemmTree-3 - climate center,NGTB,loaned,mini tree v1.3,
+EC:62:60:FD:86:80,Mini HemmTree-3,NGTB,,mini tree v1.3,
 EC:62:60:FD:88:4C,Megan Hawley (GUEST intern),NGTB,Owned,mini tree v1.3,
 EC:62:60:FD:88:A8,Mini HemmTree-4 - Dora,NGTB,loaned,mini tree v1.3,
 EC:62:60:FD:8D:EC,Mini HemmTree-5 - SC front desk,NGTB,Loaned,mini tree v1.3,
 EC:62:60:FD:8E:4C,Jake V,NGTB,Owned,mini tree v1.3,
 EC:62:60:FE:0F:94,Elise Busse (raffle winner '23),NGTB,Owned,mini tree v1.3,
 EC:62:60:FE:15:70,CSI office,NGTB,Loaned,mini tree v1.3,
-EC:62:60:FE:29:70,Mini HemmTree-6 - Lori,NGTB,loaned,mini tree v1.3,
-EC:62:60:FE:A8:30,Mini HemmTree-7 - NGTB front desk,NGTB,Loaned,mini tree v1.3,
+EC:62:60:FE:29:70,Mini HemmTree-6,NGTB,,mini tree v1.3,
+EC:62:60:FE:A8:30,Mini HemmTree-7,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:44,Mini HemmTree-8 - Mission & Ministry,NGTB,Loaned,mini tree v1.3,
-EC:62:60:FE:A8:5C,Mini HemmTree-9 - welcome desk,NGTB,loaned,mini tree v1.3,
+EC:62:60:FE:A8:5C,Mini HemmTree-9,NGTB,,mini tree v1.3,
 D4:D4:DA:59:27:E4,Heather & Jason,Blaine,Owned,mini tree v1.2,has level shifter chip fix
 D4:D4:DA:46:EB:38,Mr. Castaneda,Blaine,Owned,mini tree v1.1,needs isminitree pin modified
 D4:D4:DA:59:28:08,Kyle & Margaret,Blaine,Owned,mini tree v1.2,needs isminitree pin modified. doesn't appear to have level shift issue
