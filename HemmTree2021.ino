@@ -649,6 +649,16 @@ void callback(char* topic, byte* message, unsigned int length) {
         }
       }
 
+      // Adding Jaxon's EVIL MODE:
+      if (messageTemp.substring(5) == "evilmode") {
+        // Start small: set all lights to black ( OFF ):
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 0, 0);
+          delay(5);
+          strip.show();
+        }
+      }
+
       if (messageTemp.substring(5) == "differentcolors") {
         int red;
         int green;
