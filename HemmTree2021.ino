@@ -99,7 +99,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.181"
+  "0.182"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -2169,11 +2169,12 @@ void slide(){
   stripSecondCopyBlue[0]=lastPixelBlue;
 
   for(int i=0;i<stripLength;i++){
-    stripUpdate(i,stripSecondCopyRed[i],stripSecondCopyGreen[i],stripSecondCopyBlue[i]);
+    //stripUpdate(i,stripSecondCopyRed[i],stripSecondCopyGreen[i],stripSecondCopyBlue[i]); 
+    strip.setPixelColor(i,strip.Color(stripSecondCopyRed[i],stripSecondCopyGreen[i],stripSecondCopyBlue[i])); //colors get swapped when using different ordered RGB strips if you use stripUpdate()
   }
   strip.show();
 
-  delay(140);
+  delay(110);
 
 }
 
