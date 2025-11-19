@@ -71,6 +71,8 @@ int mode4SpeedFactor;
 
 int twinkleBeginCtr = 0; //used to fade in to twinkle mode slower at the beginning
 
+int slideCtr = 0; //used in slide animation
+
 uint8_t* stripCopyRed; //an array to store a copy of the strip values in. Useful for modes like twinkle() when each LED's next state is based on it's own previous state. This size will be set to stripLength at runtime
 uint8_t* stripCopyGreen;
 uint8_t* stripCopyBlue;
@@ -97,7 +99,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.180"
+  "0.181"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1599,6 +1601,9 @@ void callback(char* topic, byte* message, unsigned int length) {
       } else if (messageTemp.substring(5) == "vsa") {
         dynamMode = 10;
       }
+      else if (messageTemp.substring(5) == "slide"){
+        dynamMode=11;
+      }
     } else if (messageTemp.substring(0, 5) != "PULSE" && messageTemp.substring(0, 5) != "SHORT") { //reset to inactive animation if any message prefix other than DYNAM or PULSE comes through
       dynamMode = 0;
     }
@@ -1704,7 +1709,9 @@ void loop() {
     twinkleMod();
   } else if (dynamMode == 10) {
     vsa();
-  } 
+  } else if (dynamMode == 11) {
+    slide();
+  }
 }
 
   //DYNAMIC ANIMATION FUNCTIONS
@@ -2068,7 +2075,7 @@ void multiColorWipe() {
 
 //MODIFIER MODES
 void twinkleMod() {
-  if (setupMode) { //If we ever update stripCopy EVERY time we update the strip, we should change this to start at the previous mode and twinkle out from there instead of filling with random
+  if (setupMode) { 
     twinkleBeginCtr = 0;
     for (int i = 0; i < stripLength; i++) {
       stripSecondCopyRed[i] = stripCopyRed[i];
@@ -2137,6 +2144,37 @@ void twinkleMod() {
   } else {
     delay(8);
   }
+}
+
+void slide(){
+  if(setupMode){
+    Serial.println("starting slide");
+    for (int i = 0; i < stripLength; i++) { //stripCopy gets updated every time we change the lights (even in this mode), so set stripSecondCopy to hold the original state (that we can then modify every iteration without it getting messed with)
+      stripSecondCopyRed[i] = stripCopyRed[i];
+      stripSecondCopyGreen[i] = stripCopyGreen[i];
+      stripSecondCopyBlue[i] = stripCopyBlue[i];
+    }
+  }
+
+  int lastPixelRed=stripSecondCopyRed[stripLength-1];
+  int lastPixelGreen=stripSecondCopyGreen[stripLength-1];
+  int lastPixelBlue=stripSecondCopyBlue[stripLength-1];
+  for(int i=stripLength-1; i>0; i--){
+    stripSecondCopyRed[i]=stripSecondCopyRed[i-1];
+    stripSecondCopyGreen[i]=stripSecondCopyGreen[i-1];
+    stripSecondCopyBlue[i]=stripSecondCopyBlue[i-1];
+  }
+  stripSecondCopyRed[0]=lastPixelRed;
+  stripSecondCopyGreen[0]=lastPixelGreen;
+  stripSecondCopyBlue[0]=lastPixelBlue;
+
+  for(int i=0;i<stripLength;i++){
+    stripUpdate(i,stripSecondCopyRed[i],stripSecondCopyGreen[i],stripSecondCopyBlue[i]);
+  }
+  strip.show();
+
+  delay(140);
+
 }
 
 
