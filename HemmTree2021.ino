@@ -651,11 +651,24 @@ void callback(char* topic, byte* message, unsigned int length) {
 
       // Adding Jaxon's EVIL MODE:
       if (messageTemp.substring(5) == "evilmode") {
-        // Start small: set all lights to black ( OFF ):
-        for (int i = 0; i < stripLength; i++) {
-          stripUpdate(i, 0, 0, 0);
-          delay(5);
-          strip.show();
+
+        // Let's test some fading today:
+        
+        // Test fade color:
+        fadeColor = 200;
+
+        // Check the color of the strip:
+        checkPixel = strip.getPixelColor(0);
+
+        while ( checkPixel > (0,0,0) ) {
+          
+          // Start small: set all lights to black ( OFF ):
+          for (int i = 0; i < stripLength; i++) {
+            stripUpdate(i, fadeColor, fadeColor, fadeColor);
+            delay(5);
+            strip.show();
+          }
+          fadeColor -= 10;
         }
       }
 
@@ -1023,7 +1036,7 @@ void callback(char* topic, byte* message, unsigned int length) {
         // FIRST: establish a point of origin for the DARKNESS to spread its swift and terrible evil from:
         
         // originPoint stores the starting point of the DARKNESS.
-        int originPoint = (0, (stripLength - 1) );
+        int originPoint = (0, (stripLength - 1) ); // <--- Okay, this doesn't actually randomly pick anything.
         
         // Create the lower and upper bounds of the DARKNESS.
         int lowerDarkBound = originPoint;
