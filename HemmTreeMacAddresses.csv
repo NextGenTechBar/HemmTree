@@ -2,7 +2,7 @@ MAC,identifier,Originally Purchased By,Loaned/Owned,device type,notes
 EC:62:60:FE:A7:A0,Mini HemmTree-2 - NGTB front desk,NGTB,,mini tree v1.3,
 EC:62:60:FE:28:94,Mini HemmTree-1,NGTB - CGE Upstairs 2025 Loaner,,mini tree v1.3,
 EC:62:60:FE:10:9C,John Carnegie,NGTB,Owned,mini tree v1.3,
-EC:62:60:FE:10:54,,NGTB,,mini tree v1.3,needs joint repaired -- last quadrant is intermittant
+EC:62:60:FE:10:54,New Mission Ministry,NGTB,,mini tree v1.3,
 08:3A:F2:A9:E5:78,NGTB side desk lights,NGTB,NA,standalone ESP32,
 08:3A:F2:AA:22:90,NGTB front sign lights,NGTB,NA,standalone ESP32,
 08:3A:F2:AB:AF:1C,NGTB Back desk lights,NGTB,NA,standalone ESP32,
@@ -31,7 +31,7 @@ EC:62:60:FE:15:70,Mini HemmTree - CG201 2025 Loaner,NGTB,,mini tree v1.3,
 EC:62:60:FE:29:70,Mini HemmTree-6 - UMEC 2025 Loaner,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:30,Mini HemmTree-7 - CCE,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:44,Mini HemmTree-8 - Foley 2025 Loaner,NGTB,,mini tree v1.3,
-EC:62:60:FE:A8:5C,Mini HemmTree-9,NGTB,,mini tree v1.3,
+EC:62:60:FE:A8:5C,Mini HemmTree-9 - New Welcome Desk,NGTB,,mini tree v1.3,
 D4:D4:DA:59:27:E4,Heather & Jason,Blaine,Owned,mini tree v1.2,has level shifter chip fix
 D4:D4:DA:46:EB:38,Mr. Castaneda,Blaine,Owned,mini tree v1.1,needs isminitree pin modified
 D4:D4:DA:59:28:08,Kyle & Margaret,Blaine,Owned,mini tree v1.2,needs isminitree pin modified. doesn't appear to have level shift issue
@@ -147,12 +147,13 @@ D4:D4:DA:59:28:44,Blaine's Livingroom,Blaine,Owned,mini tree v1.2,
 44:1D:64:68:21:88,Michael Tillis - 2025 order,NGTB,owned,mini tree v1.4, 
 44:1D:64:68:21:74,Michael Tillis - 2025 order,NGTB,owned,mini tree v1.4, 
 58:BF:25:18:71:9C ,Thayne Light Up Bulldog,NGTB,owned,desk bulldog, 
-44:1D:64:68:21:70,Mini HemmTree-2025-1 (registered to ngtb iot) - Mission & Ministry office 2025 Loaner,NGTB,,mini tree v1.4, 
-44:1D:64:68:21:84,Mini HemmTree-2025-2 (registered to ngtb iot) - Welcome Desk 2025 Loaner,NGTB,,mini tree v1.4, 
+44:1D:64:68:21:70,Mini HemmTree-2025-1 (registered to ngtb iot),NGTB,,mini tree v1.4, 
+44:1D:64:68:21:84,Mini HemmTree-2025-2 (registered to ngtb iot),NGTB,,mini tree v1.4, 
 44:1D:64:68:21:8C,Mini HemmTree-2025-3 (registered to ngtb iot) - Support Center 2025 Loaner,NGTB,,mini tree v1.4, 
 44:1D:64:68:23:74,Mini HemmTree-2025-4 (registered to ngtb iot) - US Bank 2025 Loaner,NGTB,,mini tree v1.4, 
 44:1D:64:68:21:78,Mini HemmTree-2025-5 (registered to ngtb iot) - Registrar's,NGTB,,mini tree v1.4, 
 44:1D:64:68:21:90,Mini HemmTree-2025-6 (registered to ngtb iot) - CSI 2025 Loaner,NGTB,,mini tree v1.4, 
 44:1D:64:68:21:80,Mini HemmTree-2025-7 (registered to ngtb iot) - Climate Center 2025 Loaner,NGTB,,mini tree v1.4, 
+
 
 
