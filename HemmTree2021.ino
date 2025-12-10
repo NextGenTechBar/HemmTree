@@ -1,3 +1,5 @@
+//COMPATIBILITY WARNING: As of 12/2025, the latest version of the Neopixel library doesn't work for this program. Use version 1.11.0
+
 //MAC list moved to seperate file in GitHub -- https://github.com/NextGenTechBar/HemmTree/blob/main/HemmTreeMacAddresses.csv
 #include <WiFi.h>
 #include <PubSubClient.h>
