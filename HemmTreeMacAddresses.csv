@@ -23,7 +23,7 @@ EC:62:60:FD:83:E0,Mini HemmTree-10 - Inclusive Excellence (CG250) I think 2025 L
 EC:62:60:FD:83:E8,Mary Hunt,NGTB,Owned,mini tree v1.3,
 EC:62:60:FD:86:80,Mini HemmTree-3,NGTB - GUEST office 2025 Loaner,,mini tree v1.3,
 EC:62:60:FD:88:4C,Megan Hawley (GUEST intern),NGTB,Owned,mini tree v1.3,
-EC:62:60:FD:88:A8,Mini HemmTree-4 - Dora,NGTB,loaned,mini tree v1.3,
+EC:62:60:FD:88:A8,Mini HemmTree-4 - US Bank,NGTB,loaned,mini tree v1.3,
 EC:62:60:FD:8D:EC,Mini HemmTree-5 - CG214 2025 Loaner,NGTB,,mini tree v1.3,
 EC:62:60:FD:8E:4C,Jake V,NGTB,Owned,mini tree v1.3,
 EC:62:60:FE:0F:94,Elise Busse (raffle winner '23),NGTB,Owned,mini tree v1.3,
@@ -32,7 +32,7 @@ EC:62:60:FE:29:70,Mini HemmTree-6 - UMEC 2025 Loaner,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:30,Mini HemmTree-7 - CCE,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:44,Mini HemmTree-8 - Foley 2025 Loaner,NGTB,,mini tree v1.3,
 EC:62:60:FE:A8:5C,Mini HemmTree-9 - New Welcome Desk,NGTB,,mini tree v1.3,
-D4:D4:DA:59:27:E4,Heather & Jason,Blaine,Owned,mini tree v1.2,has level shifter chip fix
+D4:D4:DA:59:27:E4,old Heather & Jason,Blaine,Owned,mini tree v1.2,has level shifter chip fix. Is currently broken
 D4:D4:DA:46:EB:38,Mr. Castaneda,Blaine,Owned,mini tree v1.1,needs isminitree pin modified
 D4:D4:DA:59:28:08,Kyle & Margaret,Blaine,Owned,mini tree v1.2,needs isminitree pin modified. doesn't appear to have level shift issue
 D4:D4:DA:53:63:2C,Chelsey Hand,Blaine,Owned,mini tree v1.2,needs isminitree pin modified
@@ -150,10 +150,11 @@ D4:D4:DA:59:28:44,Blaine's Livingroom,Blaine,Owned,mini tree v1.2,
 44:1D:64:68:21:70,Jane Provost - 2025 order (registered to ngtb iot),NGTB,,mini tree v1.4, 
 44:1D:64:68:21:84,Jane Provost - 2025 order (registered to ngtb iot),NGTB,,mini tree v1.4, 
 44:1D:64:68:21:8C,Mini HemmTree-2025-3 (registered to ngtb iot) - Support Center 2025 Loaner,NGTB,,mini tree v1.4, 
-44:1D:64:68:23:74,Mini HemmTree-2025-4 (registered to ngtb iot) - US Bank 2025 Loaner,NGTB,,mini tree v1.4, 
+44:1D:64:68:23:74,Mini HemmTree-2025-4 (registered to ngtb iot) - Jason & Heather,NGTB-traded w Blaine,,mini tree v1.4, 
 44:1D:64:68:21:78,Mini HemmTree-2025-5 (registered to ngtb iot) - Registrar's,NGTB,,mini tree v1.4, 
 44:1D:64:68:21:90,Mini HemmTree-2025-6 (registered to ngtb iot) - CSI 2025 Loaner,NGTB,,mini tree v1.4, 
 44:1D:64:68:21:80,Mini HemmTree-2025-7 (registered to ngtb iot) - Climate Center 2025 Loaner,NGTB,,mini tree v1.4, 
+
 
 
 
