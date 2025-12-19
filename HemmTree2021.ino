@@ -101,7 +101,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.182"
+  "0.183"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -544,42 +544,45 @@ void callback(char* topic, byte* message, unsigned int length) {
 
     int repetitions = 0;
     if (messageTemp.substring(0, 5) == "COLOR") { //repeats the received sequence for the whole string
-      int msgLen = 9;
-      for (int i = 0; i < stripLength; i++) {
-        stringUpdate[i][0] = messageTemp.substring(5 + i * msgLen, 8 + i * msgLen).toInt(); //red
-        stringUpdate[i][1] = messageTemp.substring(8 + i * msgLen, 11 + i * msgLen).toInt(); //green
-        stringUpdate[i][2] = messageTemp.substring(11 + i * msgLen, 14 + i * msgLen).toInt(); //blue
-        if (messageTemp[14 + i * msgLen] == NULL) {
-          repetitions = i + 1;
-          break;
-        }
-      }
 
-      //now fill the rest of the empty string with a repetition of the beginning
-      for (int i = repetitions; i < stripLength; i++) {
-        stringUpdate[i][0] = stringUpdate[i % repetitions][0];
-        stringUpdate[i][1] = stringUpdate[i % repetitions][1];
-        stringUpdate[i][2] = stringUpdate[i % repetitions][2];
-      }
-
-      for (int i = 0; i < stripLength; i++) {
-        //strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
-        stripUpdate(i, stringUpdate[i][0], stringUpdate[i][1], stringUpdate[i][2]);
-        if (stripLength == 18) {
-          delay(25);
-        } else {
-          delay(5);
-        }
-        strip.show();
-      }
-      /*
-        for(int i=0;i<stripLength;i++){
-          for(int k=0;k<3;k++){
-            Serial.print(stringUpdate[i][k]);
-            Serial.print(" ");
+      if((messageTemp.length()-5)/9<stripLength){ //Ignore messages that require more pixels than we have (without this line, a strip of length X will crash and reboot if it receives a COLOR command of >X LEDs)
+        int msgLen = 9;
+        for (int i = 0; i < stripLength; i++) {
+          stringUpdate[i][0] = messageTemp.substring(5 + i * msgLen, 8 + i * msgLen).toInt(); //red
+          stringUpdate[i][1] = messageTemp.substring(8 + i * msgLen, 11 + i * msgLen).toInt(); //green
+          stringUpdate[i][2] = messageTemp.substring(11 + i * msgLen, 14 + i * msgLen).toInt(); //blue
+          if (messageTemp[14 + i * msgLen] == NULL) {
+            repetitions = i + 1;
+            break;
           }
-          Serial.println();
-        }*/
+        }
+
+        //now fill the rest of the empty string with a repetition of the beginning
+        for (int i = repetitions; i < stripLength; i++) {
+          stringUpdate[i][0] = stringUpdate[i % repetitions][0];
+          stringUpdate[i][1] = stringUpdate[i % repetitions][1];
+          stringUpdate[i][2] = stringUpdate[i % repetitions][2];
+        }
+
+        for (int i = 0; i < stripLength; i++) {
+          //strip.setPixelColor(i, strip.Color(stringUpdate[i][0],stringUpdate[i][1],stringUpdate[i][2]));
+          stripUpdate(i, stringUpdate[i][0], stringUpdate[i][1], stringUpdate[i][2]);
+          if (stripLength == 18) {
+            delay(25);
+          } else {
+            delay(5);
+          }
+          strip.show();
+        }
+        /*
+          for(int i=0;i<stripLength;i++){
+            for(int k=0;k<3;k++){
+              Serial.print(stringUpdate[i][k]);
+              Serial.print(" ");
+            }
+            Serial.println();
+          }*/
+      }
     }
 
     int numColors = 0;
