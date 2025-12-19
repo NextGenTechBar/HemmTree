@@ -53,6 +53,8 @@ for i in range(len(people)):
     online = ""
     if(("BOOT" in lastSeen[i]) or ("RECONNECT" in lastSeen[i]) or ("PING" in lastSeen[i])):
         online= "**"
+    if("DISCONNECT" in lastSeen[i]):
+        online= "~" #character to indicate it has been online at some point, but isn't now.
     print(online+people[i] + " -- " + lastSeen[i])
 
 
@@ -86,35 +88,5 @@ if(len(additionalMacs)>0):
         if(("BOOT" in lastSeenAdditional[i]) or ("RECONNECT" in lastSeenAdditional[i]) or ("PING" in lastSeenAdditional[i])):
             online= "**"
         print(online+lastSeenAdditional[i])
-
-
-#below code is all for detecting number of online clients
-macs=[]
-with open('Connection Log.csv', newline='') as csvfile:
-    spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-    for row in spamreader:
-        #print(', '.join(row))
-        rowValue=(', '.join(row))
-        mac=cell(rowValue,4)
-        if(not(mac in macs)):
-            macs.append(mac)
-macs.pop(0)
-
-onlineStatus=[0]*len(macs)
-
-online_count=0
-with open('Connection Log.csv', newline='') as csvfile:
-    spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-    for row in spamreader:
-        #print(', '.join(row))
-        rowValue=(', '.join(row))
-        for i in range(len(macs)):
-            if (macs[i] in rowValue):
-                if  ('BOOT' in rowValue) or ('RECONNECT' in rowValue) or ('PING' in rowValue):
-                    onlineStatus[i]=1
-                else:
-                    onlineStatus[i]=0
-            
-for i in range(len(onlineStatus)):
-    online_count+=onlineStatus[i]
-print(str(online_count)+" Online Devices")
+           
+x = input("Press enter to exit")
