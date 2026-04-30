@@ -101,7 +101,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.183"
+  "0.184"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -1214,6 +1214,16 @@ void callback(char* topic, byte* message, unsigned int length) {
           delay(120);
         }
       }
+
+      if (messageTemp.substring(5) == "green") { //used to flash green when someone taps their zagcard :)
+        for (int i = 0; i < stripLength; i++) {
+          stripUpdate(i, 0, 255, 0);
+        }
+        strip.show();
+
+        delay(1500); //stay green just for this long
+      }
+
 //      -... --- -.-- ... / -.- .. ... ... .. -. --.
 
       if (messageTemp.substring(5) == "alex") {
