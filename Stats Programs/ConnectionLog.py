@@ -16,4 +16,4 @@ def on_message_print(client, userdata, message):
         myfile.write(",")
         myfile.write(msg)
         
-subscribe.callback(on_message_print, "GUHemmTree/connectionLog", hostname="broker.mqttdashboard.com")
+subscribe.callback(on_message_print, "GUHemmTree/connectionLog", hostname="ngtblights.gonzaga.edu")
