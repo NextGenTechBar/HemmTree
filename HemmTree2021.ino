@@ -100,11 +100,11 @@ int lastBrightnessValue = 255;
 bool isMiniTree = false; //setup will read pin 13 and set this true if the pin is connected, indicating it is a mini-tree
 
 // LED Pin
-const int ledPin = 4;
+//const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.186"
+  "0.187"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -318,7 +318,7 @@ void setup() {
     firmwareUpdate(false);
   }
 
-  pinMode(ledPin, OUTPUT);
+  //pinMode(ledPin, OUTPUT);
 }
 
 void stripUpdate(int pixel, int r, int g, int b) {
@@ -540,7 +540,7 @@ void callback(char* topic, byte* message, unsigned int length) {
           }
         }
 
-        for (int fadeOn = 0; fadeOn < 255; fadeOn++) {
+        for (int fadeOn = 0; fadeOn < 256; fadeOn++) {
           if (fadeOn % 5 == 0) {
             strip.setBrightness(fadeOn);
             for (int i = 0; i < stripLength; i++) {
@@ -1939,7 +1939,7 @@ void loop() {
           //it's actually still too slow with no delay, so update two pixels at a time
           for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
             if(i<stripLength-1){ //OOB protection
-              pixelHue = mode1firstPixelHue + (i+1 * 65536L / strip.numPixels());
+              pixelHue = mode1firstPixelHue + ((i+1) * 65536L / strip.numPixels());
               tempPixelHue = strip.gamma32(strip.ColorHSV(pixelHue));
               stripUpdateHSV(i+1, tempPixelHue);
               i++;
@@ -2412,7 +2412,7 @@ void firmwareUpdate(bool sandbox) { //if firmwareUpdate(true) is called, update 
   //client.setCACert(rootCACertificate);
   client.setInsecure(); //prevents having the update the CA certificate periodically (it expiring breaks github updates which SUCKS cause you have to update each ornament manually with the new certificate
   if (!isMiniTree) { //don't blink the light on mini tress, because they do not have a light and if D15 and D2 are shorted to switch RGB order, setting the LED (which uses pin 2) overrides the color order when it reboots the first time and red/green get swapped
-    httpUpdate.setLedPin(LED_BUILTIN, LOW); //COMMENTING THIS OUT FOR NOW -- It will disable visual tracking of updates on devkit boards, but having it on makes it so that the 75+ mini hemm trees with D15 and D2 shorted (to correct the color order) have the wrong colors after first reboot
+    //httpUpdate.setLedPin(LED_BUILTIN, LOW); //COMMENTING THIS OUT FOR NOW -- It will disable visual tracking of updates on devkit boards, but having it on makes it so that the 75+ mini hemm trees with D15 and D2 shorted (to correct the color order) have the wrong colors after first reboot
   }
 
   t_httpUpdate_return ret;
