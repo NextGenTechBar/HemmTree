@@ -14,6 +14,8 @@
 //#include "cert.h" //no longer necessary with setInsecure()
 #include <WiFiManager.h>
 
+#include <vector> 
+
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
 #include <avr/power.h>
@@ -102,7 +104,7 @@ const int ledPin = 4;
 
 //GITHUB update code. Change this number for each version increment
 String FirmwareVer = {
-  "0.185"
+  "0.186"
 };
 #define URL_fw_Version "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/code_version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/NextGenTechBar/HemmTree/main/ESP32_code.bin"
@@ -110,7 +112,8 @@ String FirmwareVer = {
 
 void firmwareUpdate(bool sandbox);
 int FirmwareVersionCheck();
-void stripUpdate();
+void stripUpdateHSV(int pixel, uint32_t c);
+void stripUpdate(int pixel, int r, int g, int b);
 
 void setup() {
   //Prevent rollback to previous firmware
@@ -268,6 +271,15 @@ void setup() {
     }
     if (stripLength == 18) {
       delay(25);
+    }else if (stripLength>300){
+      //no delay needed for massive strips, time to update strip creates enough delay on it's own
+      //it's actually still too slow with no delay, so update two pixels at a time
+      for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+        if(i<stripLength-1){ //OOB protection
+          stripUpdate(i+1, 255,255,255);
+          i++;
+        }
+      }
     } else {
       delay(5);
     }
@@ -456,7 +468,7 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.println();
 
   //initialize blank array to store colors in (eventually pushed to strip)
-  int stringUpdate[stripLength][3];
+  std::vector<std::array<uint8_t,3>> stringUpdate(stripLength); //This line is equivilant to what it was perviously (at the end of this comment), but declares it in the heap instead of the small stack, which overflows over a length of ~200 pixels. OLD LINE: int stringUpdate[stripLength][3];
   for (int i = 0; i < stripLength; i++) {
     for (int k = 0; k < 3; k++) {
       stringUpdate[i][k] = 0;
@@ -570,6 +582,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           stripUpdate(i, stringUpdate[i][0], stringUpdate[i][1], stringUpdate[i][2]);
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+            //no delay needed for massive strips, time to update strip creates enough delay on it's own
+            //it's actually still too slow with no delay, so update two pixels at a time
+            for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+              if(i<stripLength-1){ //OOB protection
+                stripUpdate(i+1, stringUpdate[i+1][0], stringUpdate[i+1][1], stringUpdate[i+1][2]);
+                i++;
+              }
+            }
           } else {
             delay(5);
           }
@@ -605,6 +626,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           stripUpdate(i, red, green, blue);
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+          //no delay needed for massive strips, time to update strip creates enough delay on it's own
+          //it's actually still too slow with no delay, so update two pixels at a time
+          for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+            if(i<stripLength-1){ //OOB protection
+              stripUpdate(i+1, red, green, blue);
+              i++;
+            }
+          }
           } else {
             delay(5);
           }
@@ -620,6 +650,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           strip.show();
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+            //no delay needed for massive strips, time to update strip creates enough delay on it's own
+            //it's actually still too slow with no delay, so update two pixels at a time
+            for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+              if(i<stripLength-1){ //OOB protection
+                stripUpdate(i+1, random(0, 255), random(0, 255), random(0, 255));
+                i++;
+              }
+            }
           } else {
             delay(5);
           }
@@ -632,24 +671,55 @@ void callback(char* topic, byte* message, unsigned int length) {
             stripUpdate(i, 0, 255, 0);
             if (stripLength == 18) {
               delay(25);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, 0, 255, 0);
+                  i++;
+                }
+              }
             } else {
               delay(5);
             }
             strip.show();
-            stripUpdate(i + 1, 0, 255, 0);
+            if (i + 1 < stripLength) { //OOB protection
+              stripUpdate(i + 1, 0, 255, 0);
+            }
             if (stripLength == 18) {
               delay(25);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-2){ //OOB protection (this loop writes i+2, so it needs one more pixel of room than the others)
+                  stripUpdate(i+2, 0, 255, 0);
+                  i++;
+                }
+              }
             } else {
               delay(5);
             }
             strip.show();
-            stripUpdate(i + 2, 0, 255, 0);
+            if (i + 2 < stripLength) { //OOB protection
+              stripUpdate(i + 2, 0, 255, 0);
+            }
             i = i + 2;
           } else {
             stripUpdate(i, 0, 0, 0);
           }
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, 0,0,0);
+                  i++;
+                }
+              }
           } else {
             delay(5);
           }
@@ -693,6 +763,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           strip.show();
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, red,green,blue);
+                  i++;
+                }
+              }
           } else {
             delay(5);
           }
@@ -707,6 +786,17 @@ void callback(char* topic, byte* message, unsigned int length) {
           stripUpdateHSV(i, tempPixelHue); //update stripCopy even though we're not using the stripUpdate() function
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+            //no delay needed for massive strips, time to update strip creates enough delay on it's own
+            //it's actually still too slow with no delay, so update two pixels at a time
+            for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+              if(i<stripLength-1){ //OOB protection
+                pixelHue = 0 + ((i+1) * 65536L / strip.numPixels());
+                tempPixelHue = strip.gamma32(strip.ColorHSV(pixelHue));
+                stripUpdateHSV(i+1, tempPixelHue);
+                i++;
+              }
+            }
           } else {
             delay(5);
           }
@@ -736,6 +826,15 @@ void callback(char* topic, byte* message, unsigned int length) {
             stripUpdate(i, red, green, blue);
             if (stripLength == 18) {
               delay(59);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, red, green, blue);
+                  i++;
+                }
+              }
             } else {
               delay(5);
             }
@@ -745,6 +844,15 @@ void callback(char* topic, byte* message, unsigned int length) {
             stripUpdate(i, 0, 0, 0);
             if (stripLength == 18) {
               delay(59);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, 0, 0, 0);
+                  i++;
+                }
+              }
             } else {
               delay(5);
             }
@@ -762,6 +870,15 @@ void callback(char* topic, byte* message, unsigned int length) {
             stripUpdate(i, red, green, blue);
             if (stripLength == 18) {
               delay(59);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, red, green, blue);
+                  i++;
+                }
+              }
             } else {
               delay(5);
             }
@@ -782,6 +899,15 @@ void callback(char* topic, byte* message, unsigned int length) {
             stripUpdate(i, red, green, blue);
             if (stripLength == 18) {
               delay(59);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, red, green, blue);
+                  i++;
+                }
+              }
             } else {
               delay(5);
             }
@@ -789,7 +915,7 @@ void callback(char* topic, byte* message, unsigned int length) {
           }
         }
 
-        int tempStorage[stripLength][3];
+        std::vector<std::array<uint8_t,3>> tempStorage(stripLength);  //Equivilant to old line, but in heap instead. OLD LINE: int tempStorage[stripLength][3];
         for (uint16_t i = 0; i < stripLength; i++) {
           uint8_t LEDr = (strip.getPixelColor(i) >> 16);
           uint8_t LEDg = (strip.getPixelColor(i) >> 8);
@@ -963,6 +1089,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           stripUpdate(i, 255, 0, 0);
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, 255, 0, 0);
+                  i++;
+                }
+              }
           } else {
             delay(5);
           }
@@ -972,6 +1107,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           stripUpdate(i, 255, 0, 255 * ((float(i - solidCount)) / (stripLength / 2 - solidCount)));
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+            //no delay needed for massive strips, time to update strip creates enough delay on it's own
+            //it's actually still too slow with no delay, so update two pixels at a time
+            for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+              if(i<stripLength-1){ //OOB protection
+                stripUpdate(i+1, 255, 0, 255 * ((float(i+1 - solidCount)) / (stripLength / 2 - solidCount)));
+                i++;
+              }
+            }
           } else {
             delay(5);
           }
@@ -981,6 +1125,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           stripUpdate(i, 255, (255 * (float(i - stripLength / 2) / (stripLength / 2))), 255);
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+            //no delay needed for massive strips, time to update strip creates enough delay on it's own
+            //it's actually still too slow with no delay, so update two pixels at a time
+            for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+              if(i<stripLength-1){ //OOB protection
+                stripUpdate(i+1, 255, (255 * (float(i+1 - stripLength / 2) / (stripLength / 2))), 255);
+                i++;
+              }
+            }
           } else {
             delay(5);
           }
@@ -994,6 +1147,15 @@ void callback(char* topic, byte* message, unsigned int length) {
             stripUpdate(i, 255, 0, 128); // Pink (255, 0, 128)
             if (stripLength == 18) {
                 delay(25);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(i+1, 255, 0, 128);
+                  i++;
+                }
+              }
             } else {
                 delay(5);
             }
@@ -1009,6 +1171,20 @@ void callback(char* topic, byte* message, unsigned int length) {
             );
             if (stripLength == 18) {
                 delay(25);
+            }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  stripUpdate(
+                i+1,
+                255 - (255 * ((float(i+1 - solidCount)) / (stripLength - solidCount))), // Red decreases to 0
+                0,   // Keep green constant at 0
+                128 + (127 * ((float(i+1 - solidCount)) / (stripLength - solidCount))) // Blue increases to 255
+            );
+                  i++;
+                }
+              }
             } else {
                 delay(5);
             }
@@ -1030,7 +1206,7 @@ void callback(char* topic, byte* message, unsigned int length) {
         int darkSpreadCount = 1;
 
         
-        int tempStorage[stripLength][3];
+        std::vector<std::array<uint8_t,3>> tempStorage(stripLength);  //Equivilant to old line, but in heap instead. OLD LINE: int tempStorage[stripLength][3];
         for (uint16_t i = 0; i < stripLength; i++) {
           uint8_t LEDr = (strip.getPixelColor(i) >> 16);
           uint8_t LEDg = (strip.getPixelColor(i) >> 8);
@@ -1149,7 +1325,7 @@ void callback(char* topic, byte* message, unsigned int length) {
 
 
     if (messageTemp.substring(0, 5) == "SHORT") { //for modes that do an animation, then return to previous (so they don't interrupt dynam
-      int tempStorage[stripLength][3];
+      std::vector<std::array<uint8_t,3>> tempStorage(stripLength);  //Equivilant to old line, but in heap instead. OLD LINE: int tempStorage[stripLength][3];
       for (uint16_t i = 0; i < stripLength; i++) {
         uint8_t LEDr = (strip.getPixelColor(i) >> 16);
         uint8_t LEDg = (strip.getPixelColor(i) >> 8);
@@ -1171,6 +1347,8 @@ void callback(char* topic, byte* message, unsigned int length) {
               strip.show();
               if (stripLength == 18) {
                 delay(10);
+              }else if (stripLength>300){
+                //no delay
               } else {
                 delay(7);
               }
@@ -1185,6 +1363,8 @@ void callback(char* topic, byte* message, unsigned int length) {
               strip.show();
               if (stripLength == 18) {
                 delay(10);
+              }else if (stripLength>300){
+                //no delay
               } else {
                 delay(7);
               }
@@ -1588,6 +1768,15 @@ void callback(char* topic, byte* message, unsigned int length) {
           strip.show();
           if (stripLength == 18) {
             delay(25);
+          }else if (stripLength>300){
+              //no delay needed for massive strips, time to update strip creates enough delay on it's own
+              //it's actually still too slow with no delay, so update two pixels at a time
+              for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+                if(i<stripLength-1){ //OOB protection
+                  strip.setPixelColor(i+1, strip.Color(tempStorage[i+1][0], tempStorage[i+1][1], tempStorage[i+1][2]));
+                  i++;
+                }
+              }
           } else {
             delay(5);
           }
@@ -1745,6 +1934,17 @@ void loop() {
       if (setupMode) { //if it's the first time, incrementally set strip to rainbow colors as a transition
         if (stripLength == 18) {
           delay(25);
+        }else if (stripLength>300){
+          //no delay needed for massive strips, time to update strip creates enough delay on it's own
+          //it's actually still too slow with no delay, so update two pixels at a time
+          for(int x=0;x<2;x++){ //change x+1 pixels at the same time (to speed up the whole animation)
+            if(i<stripLength-1){ //OOB protection
+              pixelHue = mode1firstPixelHue + (i+1 * 65536L / strip.numPixels());
+              tempPixelHue = strip.gamma32(strip.ColorHSV(pixelHue));
+              stripUpdateHSV(i+1, tempPixelHue);
+              i++;
+            }
+          }
         } else {
           delay(5);
         }
